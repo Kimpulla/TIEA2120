@@ -16,7 +16,10 @@
 */
 function jarjestaLeimaustavat(data) {
   console.log(data);
-  return data.leimaustavat; // tässä pitää palauttaa järjestetty kopio eikä alkuperäistä
+
+  const leimaustavat = JSON.parse(JSON.stringify(data.leimaustavat)); // Luodaan kopio nimellä "leimaustavat".
+  leimaustavat.sort(); // Järjestetään kopio aakkosjärjestykseen.
+  return leimaustavat; // Palautetaan järjestetty kopio.
 }
 
 /**
@@ -28,9 +31,28 @@ function jarjestaLeimaustavat(data) {
   * @return {Array} palauttaa järjestetyn _kopion_ data.sarjat-taulukosta
   */
 function jarjestaSarjat(data) {
-  return data.sarjat;  // tässä pitää palauttaa järjestetty kopio eikä alkuperäistä
+
+  let sarjat = Array.from(data.sarjat); // Kopioidaan käyttäen "Array.form", näin vältytään circular 
+  sarjat.sort(compare);
+  return sarjat; // Palautetaan järjestetty kopio.
 }
 
+
+/**
+ * Apumetodi, joka vertailee annettuja arvoja.
+ * @param {*} a 
+ * @param {*} b 
+ * @returns 
+ */
+ function compare(a, b) {
+  if (a.nimi < b.nimi) {
+    return -1;
+  }
+  if (a.nimi > b.nimi) {
+    return 1;
+  }
+  return 0;
+}
 
 /**
   * Taso 1
