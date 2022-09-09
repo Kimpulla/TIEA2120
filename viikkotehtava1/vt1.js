@@ -22,6 +22,8 @@ function jarjestaLeimaustavat(data) {
   return leimaustavat; // Palautetaan järjestetty kopio.
 }
 
+
+
 /**
   * Taso 1
   * Järjestää sarjat aakkosjärjestykseen sarjan nimen perustella 
@@ -32,9 +34,32 @@ function jarjestaLeimaustavat(data) {
   */
 function jarjestaSarjat(data) {
 
-  let sarjat = Array.from(data.sarjat); // Kopioidaan käyttäen "Array.form", näin vältytään circular 
-  sarjat.sort(compare);
-  return sarjat; // Palautetaan järjestetty kopio.
+const sarjat = Array.from(data.sarjat, ((sarja) => {
+
+    let a = {alkuaika : sarja.alkuaika,
+      id : sarja.id,
+      kesto : sarja.kesto,
+      nimi: sarja.nimi,
+      joukkueet : sarja.joukkueet,
+      };
+      return a;
+
+
+ }));
+sarjat.sort(compare);
+return sarjat; // Palautetaan järjestetty kopio.
+}
+
+
+/**
+ * Kopioi taulukon.
+ * 
+ * @param {Object} array 
+ * @returns {Array}
+ */
+function copyDeep(array) {
+  return Array.from(array);
+
 }
 
 
@@ -53,6 +78,9 @@ function jarjestaSarjat(data) {
   }
   return 0;
 }
+
+
+
 
 /**
   * Taso 1
