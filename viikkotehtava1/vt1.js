@@ -44,22 +44,9 @@ const sarjat = Array.from(data.sarjat, ((sarja) => {
       };
       return a;
 
-
  }));
 sarjat.sort(compare);
 return sarjat; // Palautetaan järjestetty kopio.
-}
-
-
-/**
- * Kopioi taulukon.
- * 
- * @param {Object} array 
- * @returns {Array}
- */
-function copyDeep(array) {
-  return Array.from(array);
-
 }
 
 
