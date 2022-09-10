@@ -166,7 +166,7 @@ return data;
 function poistaJoukkue(data, id) {
   for (let joukkue of data.joukkueet){
     if (joukkue.id == id){
-      data.joukkueet.splice(joukkue, 1);
+      data.joukkueet.splice(joukkue.id, 1);
     }
   }
   return data;
@@ -219,8 +219,57 @@ function jarjestaRastit(data) {
   * @return {Object} palauttaa muutetun alkuperäisen data-tietorakenteen
   */
 function lisaaJoukkue(data, nimi, leimaustavat, sarja, jasenet) {
+  if(!data.joukkueet.some(joukkue => joukkue.nimi === nimi) && whitespaceCheck(nimi) == false &&
+  leimaustavat.length >= 1 && jasenet.length >= 2  && hasDuplicates(jasenet) == false &&
+  findId(data.sarjat,sarja) == true){
+
+  //  console.log("inludes:"+ findId(data.sarjat,sarja) );
+  //  console.log("duplicates has:"+ hasDuplicates(jasenet));
+try{
+  
+    let newTeam = {"nimi": nimi, "pisteet": 0, "matka": 0, "id": generateId(100000), "jasenet": jasenet,
+     "leimaustapa": leimaustavat, "rastileimaukset": [], "sarja": palautaSarja(data.sarjat, sarja), "aika": "00:00:00" };
+    data.joukkueet.push(newTeam);
+}
+catch (error){
+  console.log("jokin meni vikaan:" + error.message);
+}
+
   return data;
 }
+  return data;
+}
+
+
+/**
+ * Apumetodi, jolla palautetaan haluttu sarja.
+ * 
+ * 
+ * @param {Array} arr 
+ * @param {String} input 
+ * @returns sarjan
+ */
+ function palautaSarja(arr, input){
+
+  let index;
+  
+  if (findId(arr, input) == true ){
+  index = arr.map(object => object.id).indexOf(parseInt(input));
+  }
+  return arr[index];
+  }
+
+
+/**
+ * Apumetodi, joka tarkastaa onka taulukossa duplikaatteja.
+ * 
+ * @param {Array} array 
+ * @returns false, jos duplikaatteja ei ole.
+ */
+ function hasDuplicates(array) {
+  return (new Set(array)).size !== array.length;
+}
+
 
 /**
   * Taso 3
