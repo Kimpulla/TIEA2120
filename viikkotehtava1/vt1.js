@@ -98,9 +98,16 @@ function lisaaSarja(data, nimi, kesto, alkuaika, loppuaika) {
   if(!data.sarjat.some(sarja => sarja.nimi === nimi) &&
   kesto > 0 && whitespaceCheck(nimi) == false){
 
+
+  let id = generateId();
+  // Tarkistetaan onko id jo olemassa, jos on luodaan uusi id.
+  while (findId(data.sarjat,id) == true){
+    id = generateId();
+  }
+
    let obj = {"nimi": nimi,
    "kesto": parseInt(kesto),
-   "id": generateId(),
+   "id": id,
    "alkuaika": alkuaika, 
    "loppuaika": loppuaika};
 
@@ -111,6 +118,20 @@ function lisaaSarja(data, nimi, kesto, alkuaika, loppuaika) {
  }
 return data;
 }
+
+/**
+ * Apumetodi, jolla selvitetään onko id data.sarjat taulukossa.
+ * 
+ * @param {Array} arr 
+ * @param {String} input 
+ * @returns true, jos input löytyy taulukosta.
+ */
+ function findId(arr,input){
+  if(arr.some(sarja => sarja.id === parseInt(input))){
+    return true;
+  }
+  return false;
+  }
 
 
 /**
