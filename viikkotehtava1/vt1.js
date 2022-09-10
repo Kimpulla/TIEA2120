@@ -98,7 +98,8 @@ function lisaaSarja(data, nimi, kesto, alkuaika, loppuaika) {
   if(!data.sarjat.some(sarja => sarja.nimi === nimi) &&
   kesto > 0 && whitespaceCheck(nimi) == false){
 
-    let id = generateId();
+
+  let id = generateId();
   // Tarkistetaan onko id jo olemassa, jos on luodaan uusi id.
   while (findId(data.sarjat,id) == true){
     id = generateId();
