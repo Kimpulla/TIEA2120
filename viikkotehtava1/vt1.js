@@ -94,8 +94,45 @@ return sarjat; // Palautetaan järjestetty kopio.
   * @return {Object} palauttaa muutetun alkuperäisen data-tietorakenteen
   */
 function lisaaSarja(data, nimi, kesto, alkuaika, loppuaika) {
-  return data;
+
+  if(!data.sarjat.some(sarja => sarja.nimi === nimi) &&
+  kesto > 0 && whitespaceCheck(nimi) == false){
+
+   let obj = {"nimi": nimi,
+   "kesto": parseInt(kesto),
+   "id": generateId(),
+   "alkuaika": alkuaika, 
+   "loppuaika": loppuaika};
+
+   data.sarjat.push(obj);
+ }
+ else {
+   console.log("Error");
+ }
+return data;
 }
+
+
+/**
+ * Luo uuden satunnaisen Id:n käyttäen apuna {@link Math} rajapintaa.
+ * 
+ * @returns {Number} - palauttaa satunnaisen numeron.
+ */
+ function generateId() {
+  return new Date().getTime();
+}
+
+
+/**
+ * Tarkastaa onko merkkijono tyhjä. Käyttää apuna {@link String.trim} metodia.
+ *  
+ * @param {String} str - tarkastettava merkkijono.
+ * @returns - palauttaa true, jos merkkijono on sisällöltään tyhjä.
+ */
+ function whitespaceCheck(str) {
+  return str.trim().length === 0;
+}
+
 
 /**
   * Taso 1
