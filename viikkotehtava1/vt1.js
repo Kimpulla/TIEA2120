@@ -164,6 +164,11 @@ return data;
   * @return {Object} palauttaa muuttuneen alkuperäisen datan
   */
 function poistaJoukkue(data, id) {
+  for (let joukkue of data.joukkueet){
+    if (joukkue.id == id){
+      data.joukkueet.splice(joukkue, 1);
+    }
+  }
   return data;
 }
 
