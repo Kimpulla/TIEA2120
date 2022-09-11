@@ -191,11 +191,11 @@ function jarjestaRastit(data) {
 }
 
 /**
- * Apumetodi compare1, järjestää rastit.
+ * Apumetodi compareRastit, järjestää rastit.
  * 
  * @param {String} a 
  * @param {String} b 
- * @returns  oikean järjestyksen
+ * @returns  rastit oikeassa järjestyksessä.
  */
  function compareRastit(a, b) {
   let tulos = a.koodi.localeCompare(a.koodi, 'fi', {sensitivity: 'base'});
