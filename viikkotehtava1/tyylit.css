@@ -1,0 +1,160 @@
+/*
+ * Styling.
+ */
+ #vt1 div {
+    display: inline-table;
+    margin-right: 1em;
+    vertical-align: top;
+}
+
+
+/* - */
+div > div > div > ul > li > div{
+    margin-top: 15px;
+    margin-left: -3em;
+  }
+
+
+/* Reunat */
+div > div > div > div {
+    border: 3px solid black;
+}
+
+
+/* Muokataan labeleita */
+label{
+    display:grid;
+    grid-template-columns: 1em 4fr;
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+fieldset:nth-child(5) label {
+    margin-top: 1em;
+    border:none;
+    display:flex; 
+    font-weight: normal; 
+ 
+}
+
+form:nth-child(1) label {
+    font-weight: bold; 
+ 
+}
+
+form > fieldset > label:first-of-type{
+    font-weight:bold;
+}
+
+
+/* Input */
+input[type=text]{
+    margin-left: 5em;
+    margin-bottom: 1em;
+}
+
+input[name=leimaustavat]{
+    margin-left: 3.5em;
+    margin-bottom: 0.5em;
+}
+
+input[name=sarja]{
+    margin-left: 2em;
+    margin-bottom: 0.5em;
+}
+
+
+/* Legend */
+legend:first-of-type{
+    margin-top: 1em;
+    margin-left: 5%;
+}
+
+fieldset:nth-child(3) legend {
+    margin-left: 1em;
+    font-weight: bold;
+ }
+
+ fieldset:nth-child(4) legend {
+    margin-left: 1em; 
+    font-weight: bold;
+}
+
+fieldset:nth-child(5) legend {
+    margin-left: 1em; 
+    font-weight: bold;
+}
+
+
+/* Fieldset */
+fieldset {
+    margin: 1em; 
+}
+
+fieldset:nth-child(3) {
+    border:none;
+    display: inline;
+    font-weight: normal;
+}
+
+fieldset:nth-child(4) {
+    border:none;
+    margin-left: 2em;
+    float: left;
+}
+
+fieldset:nth-child(5) {
+    border:none;   
+}
+
+
+/*h1-h6*/
+h2, h3 {
+    margin-left: 1em;
+}
+
+
+/* Poista väri*/
+.red{
+    color:red;
+    
+}
+
+
+/* Nappulat */
+button{
+    margin-left: 1em;
+}
+    
+
+/* Table */
+table {
+    margin: 1em;
+}
+
+table, th, td {
+    border-collapse: collapse;
+    border-style: dotted;
+    border-width: 2px;;
+    vertical-align: top;
+}
+
+td > ul {
+    margin-left: -1.5em;
+    margin-top: -1%;
+    margin-bottom: -1%;
+    vertical-align: top;
+    
+}
+
+
+/* Span */
+span[title="Siirrä ylöspäin"]{
+    margin-left: 20em;
+     float: right;
+}
+
+span[title="Siirrä alaspäin"]{
+    margin-right: -20em;
+    float: right;
+}
