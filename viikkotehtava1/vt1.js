@@ -182,9 +182,30 @@ function poistaJoukkue(data, id) {
   * @return {Array} palauttaa järjestetyn _kopion_ data.rastit-taulukosta
   */
 function jarjestaRastit(data) {
-  return data.rastit; // tässä pitää palauttaa järjestetty kopio
+
+  let rastit = JSON.parse(JSON.stringify(data.rastit)); // Kopioidaan taulukko tietorakenteesta.
+ 
+  rastit.sort(compareRastit);
+
+  return rastit; // tässä pitää palauttaa järjestetty kopio
 }
 
+/**
+ * Apumetodi compare1, järjestää rastit.
+ * 
+ * @param {String} a 
+ * @param {String} b 
+ * @returns  oikean järjestyksen
+ */
+ function compareRastit(a, b) {
+  let tulos = a.koodi.localeCompare(a.koodi, 'fi', {sensitivity: 'base'});
+  // Käytetään apuna regexiä. '^' aloittaa stringin ja '[a-z]' ottaa huomioon ASCII kirjaimet. 
+  // TODO tarkista vielä.
+  if ( tulos == /^[a-z]/) { 
+     return tulos;
+  }
+  return b.koodi.localeCompare(a.koodi, 'fi', {sensitivity: 'base'});
+}
 
 /**
   * Taso 3
