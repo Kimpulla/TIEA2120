@@ -282,6 +282,50 @@ catch (error){
   * @return {Object} joukkue
   */
 function laskeAika(joukkue) {
+ 
+  let firstTime, afterTime, startTime, endTime, tulos;
+
+  for(let obj of joukkue.rastileimaukset) {
+    if(obj.rasti != null) {
+      if(obj.rasti.koodi == "LAHTO") {
+        firstTime =  obj.aika;
+        startTime = firstTime.substring(firstTime.indexOf(' ') + 1);
+        
+      }
+    if(obj.rasti != null) {
+      if(obj.rasti.koodi == "MAALI"){
+        afterTime = obj.aika;
+        endTime = afterTime.substring(afterTime.indexOf(' ') + 1);
+          
+      }
+    }
+
+    }
+  }
+
+try{
+        //katkaistaan ":" kohdalta
+        let beginning = startTime.split(":");
+
+        //muutetaan sekunneiksi
+        let seconds = (+beginning[0]) * 3600 + (+beginning[1]) * 60 + (+beginning[2]); 
+
+        //katkaistaan ":" kohdalta
+        let ending = endTime.split(":");
+
+        //muutetaan sekunneiksi
+        let seconds2 = (+ending[0]) * 3600 + (+ending[1]) * 60 + (+ending[2]); 
+       
+        let date = new Date(2017,3,18);
+            date.setSeconds(seconds2 - seconds);
+
+        //otetaan vain kaksi merkitsevää lukua.
+        tulos = date.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1"); 
+
+        joukkue.aika = tulos;
+
+} catch(error){}
+  
   return joukkue;
 }
 
