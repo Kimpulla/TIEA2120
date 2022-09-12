@@ -45,7 +45,7 @@ const sarjat = Array.from(data.sarjat, ((sarja) => {
       return a;
 
  }));
-sarjat.sort(compare);
+sarjat.sort(compareName);
 return sarjat; // Palautetaan järjestetty kopio.
 }
 
@@ -56,7 +56,7 @@ return sarjat; // Palautetaan järjestetty kopio.
  * @param {*} b 
  * @returns 
  */
- function compare(a, b) {
+ function compareName(a, b) {
   if (a.nimi < b.nimi) {
     return -1;
   }
@@ -166,7 +166,7 @@ return data;
 function poistaJoukkue(data, id) {
   for (let joukkue of data.joukkueet){
     if (joukkue.id == id){
-      data.joukkueet.splice(joukkue.id, 1);
+      data.joukkueet.splice(data.joukkueet[joukkue], 1);
     }
   }
   return data;
@@ -353,12 +353,14 @@ try{
 /**
   * Taso 3 ja Taso 5
   *  Järjestää joukkueet järjestykseen haluttujen tietojen perusteella
-  *  järjestetään ensisijaisesti kasvavaan aakkosjärjestykseen 
+  *  järjestetään ensisijaisesti kasvavaan aakkosjärjestykseen !!!!
+  * 
   *  Järjestäminen on tehtävä alkuperäisen taulukon kopiolle. Alkuperäistä ei saa muuttaa tai korvata.
   *  mainsort-parametrin mukaisen tiedon perusteella. mainsort voi olla nimi, sarja, matka, aika tai pisteet
   *  Joukkueen jäsenet järjestetään aina aakkosjärjestykseen. Alkuperäisen joukkueobjektin jäsenten järjestys ei saa muuttaa.
   *  Joukkueen leimaustavat järjestetään myös aina aakkosjärjestykseen leimaustapojen nimien mukaan
   *  Isoilla ja pienillä kirjaimilla ei ole missään järjestämisissä merkitystä eikä myöskään alussa tai lopussa olevalla whitespacella
+  * 
   *  sortorder-parametrin käsittely vain tasolla 5
   *  jos sortorder-parametrina on muuta kuin tyhjä taulukko, käytetään 
   *  sortorderin ilmoittamaa järjestystä eikä huomioida mainsort-parametria: 
@@ -382,8 +384,47 @@ try{
   * @return {Array} palauttaa järjestetyn ja täydennetyn _kopion_ data.joukkueet-taulukosta
   */
 function jarjestaJoukkueet(data, mainsort="nimi", sortorder=[] ) {
-  return data.joukkueet;
+
+ // Aakkosjärjestykseen
+ // mainsort - mainsort voi olla nimi, sarja, matka, aika tai pisteet
+ // Joukkueen jäsenet järjestetään aina aakkosjärjestykseen
+ // Joukkueen leimaustavat järjestetään myös aina aakkosjärjestykseen leimaustapojen nimien mukaan
+ //TODO
+
+ const joukkueet = Array.from(data.joukkueet, ((joukkue) => {
+
+ let a = {jasenet : joukkue.jasenet,
+  id : joukkue.id,
+  aika : joukkue.aika,
+  nimi: joukkue.nimi,
+  matka : joukkue.matka,
+  sarja : joukkue.sarja,
+  rastileimaukset : joukkue.rastileimaukset,
+  pisteet : joukkue.pisteet,
+  leimaustapa : joukkue.leimaustapa
+  };
+  return a;
+
+}));
+
+if (mainsort == "nimi"){
+  joukkueet.sort(sortTeams);
 }
+
+return joukkueet;
+}
+
+/**
+ * Apumetodi, joka vertailee joukkueiden nimiä ja palauttaa ne aakkosjärjestyksessä.
+ * 
+ * @param {String} key1 
+ * @param {String} key2 
+ * @returns Taulukko aakkosjärjestyksessä.
+ */
+function sortTeams(key1, key2) {
+  return key1.nimi.localeCompare(key2.nimi, 'fi', {sensitivity: 'base'});
+}
+
 
 /**
   * Taso 5
