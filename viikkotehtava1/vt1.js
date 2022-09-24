@@ -166,7 +166,7 @@ return data;
 function poistaJoukkue(data, id) {
   for (let joukkue of data.joukkueet){
     if (joukkue.id == id){
-      data.joukkueet.splice(data.joukkueet[joukkue], 1);
+      data.joukkueet.splice(data.joukkueet.indexOf(joukkue), 1);
     }
   }
   return data;
@@ -197,15 +197,30 @@ function jarjestaRastit(data) {
  * @param {String} b 
  * @returns  rastit oikeassa järjestyksessä.
  */
- function compareRastit(a, b) {
-  let tulos = a.koodi.localeCompare(a.koodi, 'fi', {sensitivity: 'base'});
-  // Käytetään apuna regexiä. '^' aloittaa stringin ja '[a-z]' ottaa huomioon ASCII kirjaimet. 
-  // TODO tarkista vielä.
-  if ( tulos == /^[a-z]/) { 
-     return tulos;
+function compareRastit(a, b) {
+
+  let tulos = a.koodi.localeCompare(b.koodi, 'fi', {sensitivity: 'base'});
+
+  if(a.koodi.replace(/[0-9]/g, "").length >= 2){
+    if(b.koodi.replace(/[0-9]/g, "").length >= 2){
+      return tulos;
+    }
+    return -1;
+
+ }
+ else{
+  if(b.koodi.replace(/[0-9]/g, "").length >= 2){
+    return 1;
   }
-  return b.koodi.localeCompare(a.koodi, 'fi', {sensitivity: 'base'});
+ }
+
+ return tulos;
+
 }
+
+
+
+
 
 /**
   * Taso 3
@@ -240,6 +255,7 @@ function jarjestaRastit(data) {
   * @return {Object} palauttaa muutetun alkuperäisen data-tietorakenteen
   */
 function lisaaJoukkue(data, nimi, leimaustavat, sarja, jasenet) {
+
   if(!data.joukkueet.some(joukkue => joukkue.nimi === nimi) && whitespaceCheck(nimi) == false &&
   leimaustavat.length >= 1 && jasenet.length >= 2  && hasDuplicates(jasenet) == false &&
   findId(data.sarjat,sarja) == true){
@@ -389,9 +405,8 @@ function jarjestaJoukkueet(data, mainsort="nimi", sortorder=[] ) {
  // mainsort - mainsort voi olla nimi, sarja, matka, aika tai pisteet
  // Joukkueen jäsenet järjestetään aina aakkosjärjestykseen
  // Joukkueen leimaustavat järjestetään myös aina aakkosjärjestykseen leimaustapojen nimien mukaan
- //TODO
 
- const joukkueet = Array.from(data.joukkueet, ((joukkue) => {
+ let joukkueet = Array.from(data.joukkueet, ((joukkue) => {
 
  let a = {jasenet : joukkue.jasenet,
   id : joukkue.id,
@@ -403,15 +418,88 @@ function jarjestaJoukkueet(data, mainsort="nimi", sortorder=[] ) {
   pisteet : joukkue.pisteet,
   leimaustapa : joukkue.leimaustapa
   };
+
   return a;
 
 }));
 
-if (mainsort == "nimi"){
-  joukkueet.sort(sortTeams);
+
+
+//TODO LEIMAUSTAVAT AAKKOSJARJESSTYKSEEN
+/*
+for(let leimaustapa of joukkueet ){
+  if(leimaustapa == 0){
+    return leimaustapa;  
+  }
+S
 }
 
+  else if(leimaustapa == 3){
+    return leimaustapa;
+  }
+  else if(leimaustapa == 1){
+    return leimaustapa;
+  }
+  else{
+    return leimaustapa;
+  }
+}
+*/
+
+for(let joukkue of joukkueet){
+
+ joukkue.jasenet.sort((a, b) => a.localeCompare(b, 'fi', {sensitivity: 'base'}));
+
+}
+
+if (mainsort == "nimi"){
+
+  joukkueet.sort(sortTeams);
+
+}
+
+if(mainsort == "sarja"){
+
+  joukkueet.sort(compareSarja);
+   
+}
+if(mainsort == "aika"){
+
+  joukkueet.sort(sortTime);
+
+}
+
+
+//TODO
+if(mainsort == "pisteet"){
+}
+//TODO
+if(mainsort == "matka"){
+}
+
+console.log();
+
 return joukkueet;
+}
+
+
+/**
+ * Apufunktio, joka vertailee joukkeuiden sarjojen nimiä.
+ * 
+ * @param {*} joukkue1 
+ * @param {*} joukkue2 
+ * @returns -1, 0 tai 1
+ */
+function compareSarja(joukkue1, joukkue2) {
+
+  if (joukkue1.sarja.nimi < joukkue2.sarja.nimi) {
+    return -1;
+  }
+  if (joukkue1.sarja.nimi > joukkue2.sarja.nimi) {
+    return 1;
+  }
+  return 0;
+
 }
 
 /**
@@ -424,6 +512,21 @@ return joukkueet;
 function sortTeams(key1, key2) {
   return key1.nimi.localeCompare(key2.nimi, 'fi', {sensitivity: 'base'});
 }
+
+/**
+ * Apumetodi, joka vertailee joukkueiden aikoja.
+ * @param {String} aika1 
+ * @param {String} aika2 
+ * @returns  Palauttaa pienemmän ajan.
+ */
+function sortTime(aika1, aika2){
+return aika1.aika.localeCompare(aika2.aika);
+}
+
+
+
+
+
 
 
 /**
