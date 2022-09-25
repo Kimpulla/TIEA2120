@@ -63,11 +63,11 @@ function compareName(a, b) {
  * Taso 1
  * Lisää uuden sarjan data-rakenteeseen ja palauttaa muuttuneen datan
  * Sarja lisätään vain jos kaikki seuraavat ehdot täyttyvät:
- *  - Toista samannimistä sarjaa ei ole olemassa. Nimien vertailussa
- *    ei huomioida isoja ja pieniä kirjaimia tai nimen alussa ja lopussa välilyöntejä etc. (whitespace)
- *    sarjan nimi ei voi olla pelkkää whitespacea.
- * - Sarjan keston täytyy olla kokonaisluku ja suurempi kuin 0
- *  Uusi sarja tallennetaan data.sarjat-taulukkoon. Sarjan on oltava seuraavaa muotoa:
+ * Toista samannimistä sarjaa ei ole olemassa. Nimien vertailussa
+ * ei huomioida isoja ja pieniä kirjaimia tai nimen alussa ja lopussa välilyöntejä etc. (whitespace)
+ * sarjan nimi ei voi olla pelkkää whitespacea.
+ * Sarjan keston täytyy olla kokonaisluku ja suurempi kuin 0
+ * Uusi sarja tallennetaan data.sarjat-taulukkoon. Sarjan on oltava seuraavaa muotoa:
  *  {
  *     "id": {Number}, // Jokaisella sarjalle oleva uniikki kokonaislukutunniste, pakollinen tieto
  *     "nimi": {String}, // Sarjan uniikki nimi, pakollinen tieto
@@ -396,14 +396,18 @@ function jarjestaJoukkueet(data, mainsort = "nimi", sortorder = []) {
 
     return a;
   });
-
+  
+  // Updated 26.9.2022 02.14
+  // Tässä olisi leimaustapojen järjestäminen, mutta yllätykseksi sen ajaminen
+  // rikkoo joukkueen lisäämisen data.tietokantaan.
+  // Tämän function alapuolella on apufunctio compareLeima, joka avusti prosessissa.
+  /*
   for (let joukkue of joukkueet) {
     joukkue.leimaustapa.sort((a, b) => {
       return compareLeima(a, b, data.leimaustavat);
     });
   }
-
-  console.log();
+  */
 
   for (let joukkue of joukkueet) {
     joukkue.jasenet.sort((a, b) =>
@@ -426,31 +430,33 @@ function jarjestaJoukkueet(data, mainsort = "nimi", sortorder = []) {
   if (mainsort == "pisteet") {
     for (let i = 0; i < joukkueet.length - 1; i++) {
       if (joukkueet[i]["pisteet"] < joukkueet[i + 1]["pisteet"]) {
+        return joukkueet[i]["pisteet"];
       }
     }
   }
 
   if (mainsort == "matka") {
-    for (let i = 0; i < joukkueet.length - 1; i++) {
-      if (joukkueet[i]["matka"] < joukkueet[i + 1]["matka"]) {
-      }
-    }
-  }
 
-  console.log();
+  for (let i = 0; i < joukkueet.length-1 ; i++) {
+    for (let j = 1; j < joukkueet.length-1 ; j++) {
+    if (joukkueet[i]["matka"] < joukkueet[j]["matka "]) {
+      return joukkueet[i]["matka"];
+    }
+
+  }
+  }
+  }
 
   return joukkueet;
 }
 
-function compareNumbers(number1, number2) {
-  return number1 - number2;
-}
-
+/*
 function compareLeima(leima1, leima2, leimaustavat) {
   return leimaustavat[leima1].localeCompare(leimaustavat[leima2], "fi", {
     sensitivity: "base",
   });
 }
+*/
 
 /**
  * Apufunktio, joka vertailee joukkeuiden sarjojen nimiä.
@@ -506,173 +512,94 @@ function sortTime(aika1, aika2) {
  */
 function laskeMatka(joukkue) {
 
+  let secondLat, secondLon, firstLat, firstLon, midDist, firstDist, index;
 
-  /*
-  let lahtoIndeksi;
-  let maaliIndeksi;
-  
-  let firstLat;
-  let firstLon;
-  
-  let secondLat;
-  let secondLon;
-  
   let tulos = 0;
-  
-  let lahtoja = montakoKoodia(joukkue, "LAHTO");
-  let maaleja = montakoKoodia(joukkue, "MAALI");
-  
-  if(lahtoja <= 0){
-    joukkue.matka = 0;
-    return joukkue;
-  }
-  
-  if (lahtoja >= 1){
-   let koodit = joukkue.rastileimaukset.map((leimaus) =>{
-      if(leimaus?.rasti?.koodi){
-        return leimaus.rasti.koodi;
+
+  let duplicates = 0;
+
+  //etäisyys ensimmäisen rastin ja taoisen rastin kanssa
+  for (let i = 0; i < joukkue.rastileimaukset.length - 1; i++) {
+    if (joukkue.rastileimaukset[i].rasti != null) {
+      if (
+        joukkue.rastileimaukset[i].rasti.koodi == "LAHTO" &&
+        duplicates == 0
+      ) {
+        duplicates++;
       }
-      else{
-        return undefined;
+
+      if (
+        joukkue.rastileimaukset[i].rasti.koodi == "LAHTO" &&
+        duplicates == 1
+      ) {
+        firstLat = parseFloat(joukkue.rastileimaukset[i].rasti["lat"]);
+        firstLon = parseFloat(joukkue.rastileimaukset[i].rasti["lon"]);
+
+        if (
+          joukkue.rastileimaukset[i + 1].rasti.koodi != "LAHTO" &&
+          duplicates == 1
+        ) {
+          index = joukkue.rastileimaukset[i + 1];
+
+          secondLat = parseFloat(joukkue.rastileimaukset[i + 1].rasti["lat"]);
+          secondLon = parseFloat(joukkue.rastileimaukset[i + 1].rasti["lon"]);
+
+          // etäisyys ensimmäisen leimauksen ja seuraavan välillä
+          tulos = firstDist = getDistanceFromLatLonInKm(
+            firstLat,
+            firstLon,
+            secondLat,
+            secondLon
+          );
+
+          duplicates++;
+        }
       }
-    });
-  
-    lahtoIndeksi = koodit.lastIndexOf("LAHTO");
-    maaliIndeksi = koodit.lastIndexOf("MAALI");
-  
-  }
-
-//Normaali tilanne
-if(maaliIndeksi > lahtoIndeksi){
-
-
-  for(let i = lahtoIndeksi; i < maaliIndeksi;i++){
-
-  
-    if(i!= null){
-
-      firstLat = parseFloat(joukkue.rastileimaukset[i].rasti["lat"]);
-      firstLon = parseFloat(joukkue.rastileimaukset[i].rasti["lon"]);
-    
-      secondLat = parseFloat(joukkue.rastileimaukset[i+1].rasti["lat"]);
-      secondLon = parseFloat(joukkue.rastileimaukset[i+1].rasti["lon"]);
     }
-      
-    tulos = tulos + getDistanceFromLatLonInKm(firstLat,firstLon,secondLat,secondLon);
-}
 
-  }
-
-else{
-  //TÄNNE PÄÄDYTÄÄN JOS MAALI ON ENNEN LÄHTÖÄ TAULUKOSSA
-   for (let i = lahtoIndeksi; i < joukkue.rastileimaukset.length;i++) {
-   
-    
-    firstLat = parseFloat(joukkue.rastileimaukset[i].rasti["lat"]);
-    firstLon = parseFloat(joukkue.rastileimaukset[i].rasti["lon"]);
-  
-    secondLat = parseFloat(joukkue.rastileimaukset[i].rasti["lat"]);
-    secondLon = parseFloat(joukkue.rastileimaukset[i].rasti["lon"]);
-
-    tulos = tulos + getDistanceFromLatLonInKm(firstLat,firstLon,secondLat,secondLon);
-    
-   }
-   
-    for (let i = 0; i < maaliIndeksi;i++) {
-
-      firstLat = parseFloat(joukkue.rastileimaukset[i].rasti["lat"]);
-      firstLon = parseFloat(joukkue.rastileimaukset[i].rasti["lon"]);
-    
-      secondLat = parseFloat(joukkue.rastileimaukset[i+1].rasti["lat"]);
-      secondLon = parseFloat(joukkue.rastileimaukset[i+1].rasti["lon"]);
-  
-      tulos = tulos + getDistanceFromLatLonInKm(firstLat,firstLon,secondLat,secondLon);
-
-      
+    if (
+      joukkue.rastileimaukset[i].rasti != null &&
+      joukkue.rastileimaukset[i].rasti.koodi != "MAALI"
+    ) {
+      firstLat = secondLat;
+      firstLon = secondLon;
     }
-    
+    if (
+      joukkue.rastileimaukset[i + 1].rasti != null &&
+      joukkue.rastileimaukset[i + 1].rasti.koodi != "MAALI"
+    ) {
+      secondLat = parseFloat(joukkue.rastileimaukset[i + 1].rasti["lat"]);
+      secondLon = parseFloat(joukkue.rastileimaukset[i + 1].rasti["lon"]);
+    }
+    midDist = getDistanceFromLatLonInKm(
+      firstLat,
+      firstLon,
+      secondLat,
+      secondLon
+    );
+  }
+ joukkue.matka = Math.round(tulos*100)/100;
+
+  return joukkue;
 }
-}
-*/
-
-//////////////////////////
-
-let secondLat, secondLon,firstLat, firstLon,
-midDist ,firstDist, index;
-
-let tulos = 0;
-
-let duplicates = 0;
-
-//etäisyys ensimmäisen rastin ja taoisen rastin kanssa
-for(let i = 0; i < joukkue.rastileimaukset.length-1;i++){
- if(joukkue.rastileimaukset[i].rasti != null) {
-
-   if(joukkue.rastileimaukset[i].rasti.koodi == "LAHTO" && duplicates == 0) {
-     duplicates ++;
-   }
-
-   if(joukkue.rastileimaukset[i].rasti.koodi == "LAHTO" && duplicates == 1) {
-
-     firstLat =  parseFloat(joukkue.rastileimaukset[i].rasti['lat']);
-     firstLon = parseFloat(joukkue.rastileimaukset[i].rasti['lon']);
-
-   if(joukkue.rastileimaukset[i + 1].rasti.koodi != "LAHTO" && duplicates == 1) {
-
-    index = joukkue.rastileimaukset[i + 1];
-
-     secondLat =  parseFloat(joukkue.rastileimaukset[i + 1].rasti['lat']);
-     secondLon = parseFloat(joukkue.rastileimaukset[i + 1].rasti['lon']);
-
-     // etäisyys ensimmäisen leimauksen ja seuraavan välillä
-     tulos = firstDist = getDistanceFromLatLonInKm(firstLat,firstLon,secondLat,secondLon);
-
-     duplicates++;
-
-   }
-   }
- }
-
- if(joukkue.rastileimaukset[i].rasti != null && joukkue.rastileimaukset[i].rasti.koodi != "MAALI") {
-     firstLat = secondLat;
-     firstLon = secondLon;
-   }
-   if(joukkue.rastileimaukset[i + 1].rasti != null && joukkue.rastileimaukset[i + 1].rasti.koodi != "MAALI") {
-   secondLat = parseFloat(joukkue.rastileimaukset[i + 1].rasti['lat']);
-   secondLon = parseFloat(joukkue.rastileimaukset[i + 1].rasti['lon']);
-   
-   }
-   midDist = getDistanceFromLatLonInKm(firstLat,firstLon,secondLat,secondLon);
- }
-
-joukkue.matka = tulos;
-
-return joukkue;
-}
-
-
 
 /**
  * Apufunktio, joka laskee mitäkin koodia on taulukossa.
- * 
- * @param {*} joukkue 
- * @param {*} koodi 
+ *
+ * @param {*} joukkue
+ * @param {*} koodi
  * @returns määrän.
  */
-function montakoKoodia(joukkue, koodi){
-
+function montakoKoodia(joukkue, koodi) {
   let count = 0;
 
   joukkue.rastileimaukset.forEach((leimaus) => {
-   
-    if (leimaus?.rasti?.koodi == koodi){
+    if (leimaus?.rasti?.koodi == koodi) {
       count++;
     }
   });
-return count;
+  return count;
 }
-
-
 
 /**
  * Taso 5
