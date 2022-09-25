@@ -401,6 +401,7 @@ function jarjestaJoukkueet(data, mainsort = "nimi", sortorder = []) {
   // Tässä olisi leimaustapojen järjestäminen, mutta yllätykseksi sen ajaminen
   // rikkoo joukkueen lisäämisen data.tietokantaan.
   // Tämän function alapuolella on apufunctio compareLeima, joka avusti prosessissa.
+  // Rivi: 455.
   /*
   for (let joukkue of joukkueet) {
     joukkue.leimaustapa.sort((a, b) => {
