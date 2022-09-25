@@ -9,7 +9,7 @@
 
 
 /* - */
-div > div > div > ul > li > div{
+li > div{
     margin-top: 15px;
     margin-left: -3em;
   }
@@ -144,9 +144,9 @@ td > ul {
     margin-top: -1%;
     margin-bottom: -1%;
     vertical-align: top;
+  
     
 }
-
 
 /* Span */
 span[title="Siirrä ylöspäin"]{
