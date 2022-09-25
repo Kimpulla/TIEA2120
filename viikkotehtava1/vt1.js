@@ -2,7 +2,6 @@
 //@ts-check 
 // Joukkueen sarja on viite data.sarjat-taulukossa lueteltuihin sarjoihin
 // Joukkueen rastileimausten rastit ovat viitteitä data.rastit-taulukossa lueteltuihin rasteihin
-
 // Kirjoita tästä eteenpäin oma ohjelmakoodisi
 
 
@@ -15,11 +14,12 @@
   * @return {Array} palauttaa järjestetyn _kopion_ data.leimaustavat-taulukosta
 */
 function jarjestaLeimaustavat(data) {
-  console.log(data);
 
+  console.log(data);
   const leimaustavat = JSON.parse(JSON.stringify(data.leimaustavat)); // Luodaan kopio nimellä "leimaustavat".
   leimaustavat.sort(); // Järjestetään kopio aakkosjärjestykseen.
-  return leimaustavat; // Palautetaan järjestetty kopio.
+
+return leimaustavat; // Palautetaan järjestetty kopio.
 }
 
 
@@ -29,7 +29,7 @@ function jarjestaLeimaustavat(data) {
   * Järjestää sarjat aakkosjärjestykseen sarjan nimen perustella 
   * isoilla ja pienillä kirjaimilla ei ole järjestämisessä merkitystä
   * Alkuperäistä rakennetta ei saa muuttaa tai korvata vaan järjestäminen tehdään alkup. taulukon kopiolle.
-  * @param {Object} data - tietorakenne, jonka data.rastit-taulukon kopio järjestetään 
+  * @param {Object} data - tietorakenne, jonka data.sarjat-taulukon kopio järjestetään
   * @return {Array} palauttaa järjestetyn _kopion_ data.sarjat-taulukosta
   */
 function jarjestaSarjat(data) {
@@ -42,7 +42,7 @@ const sarjat = Array.from(data.sarjat, ((sarja) => {
       nimi: sarja.nimi,
       joukkueet : sarja.joukkueet,
       };
-      return a;
+    return a;
 
  }));
 sarjat.sort(compareName);
@@ -54,7 +54,7 @@ return sarjat; // Palautetaan järjestetty kopio.
  * Apumetodi, joka vertailee annettuja arvoja.
  * @param {*} a 
  * @param {*} b 
- * @returns 
+ * @returns -1,1 tai 0
  */
  function compareName(a, b) {
   if (a.nimi < b.nimi) {
@@ -99,19 +99,19 @@ function lisaaSarja(data, nimi, kesto, alkuaika, loppuaika) {
   kesto > 0 && whitespaceCheck(nimi) == false){
 
 
-  let id = generateId();
-  // Tarkistetaan onko id jo olemassa, jos on luodaan uusi id.
-  while (findId(data.sarjat,id) == true){
-    id = generateId();
-  }
+    let id = generateId();
+    // Tarkistetaan onko id jo olemassa, jos on luodaan uusi id.
+    while (findId(data.sarjat,id) == true){
+      id = generateId();
+    }
 
-   let obj = {"nimi": nimi,
-   "kesto": parseInt(kesto),
-   "id": id,
-   "alkuaika": alkuaika, 
-   "loppuaika": loppuaika};
+    let obj = {"nimi": nimi,
+    "kesto": parseInt(kesto),
+    "id": id,
+    "alkuaika": alkuaika, 
+    "loppuaika": loppuaika};
 
-   data.sarjat.push(obj);
+    data.sarjat.push(obj);
  }
  else {
    console.log("Error");
@@ -128,6 +128,7 @@ return data;
  * @returns true, jos input löytyy taulukosta.
  */
  function findId(arr,input){
+
   if(arr.some(sarja => sarja.id === parseInt(input))){
     return true;
   }
@@ -184,10 +185,9 @@ function poistaJoukkue(data, id) {
 function jarjestaRastit(data) {
 
   let rastit = JSON.parse(JSON.stringify(data.rastit)); // Kopioidaan taulukko tietorakenteesta.
- 
   rastit.sort(compareRastit);
 
-  return rastit; // tässä pitää palauttaa järjestetty kopio
+return rastit; // tässä pitää palauttaa järjestetty kopio
 }
 
 /**
@@ -215,7 +215,6 @@ function compareRastit(a, b) {
  }
 
  return tulos;
-
 }
 
 
@@ -260,8 +259,6 @@ function lisaaJoukkue(data, nimi, leimaustavat, sarja, jasenet) {
   leimaustavat.length >= 1 && jasenet.length >= 2  && hasDuplicates(jasenet) == false &&
   findId(data.sarjat,sarja) == true){
 
-  //  console.log("inludes:"+ findId(data.sarjat,sarja) );
-  //  console.log("duplicates has:"+ hasDuplicates(jasenet));
 try{
   
     let newTeam = {"nimi": nimi, "pisteet": 0, "matka": 0, "id": generateId(100000), "jasenet": jasenet,
@@ -291,7 +288,7 @@ catch (error){
   let index;
   
   if (findId(arr, input) == true ){
-  index = arr.map(object => object.id).indexOf(parseInt(input));
+    index = arr.map(object => object.id).indexOf(parseInt(input));
   }
   return arr[index];
   }
@@ -312,8 +309,8 @@ catch (error){
   * Taso 3
   * Laskee joukkueen käyttämän ajan. Tulos tallennetaan joukkue.aika-ominaisuuteen.
   * Käytä merkkijonoa, jossa aika on muodossa "hh:mm:ss". Esim. "07:30:35"
-  * Aika lasketaan viimeisestä LAHTO-rastilla tehdystä leimauksesta alkaen aina
-  * ensimmäiseen MAALI-rastilla tehtyyn leimaukseen asti. Leimauksia jotka tehdään
+  * Aika lasketaan viimeisestä (ajan mukaan) LAHTO-rastilla tehdystä leimauksesta alkaen aina
+  * ensimmäiseen (ajan mukaan) MAALI-rastilla tehtyyn leimaukseen asti. Leimauksia jotka tehdään
   * ennen lähtöleimausta tai maalileimauksen jälkeen ei huomioida.
   * @param {Object} joukkue
   * @return {Object} joukkue
@@ -426,56 +423,47 @@ function jarjestaJoukkueet(data, mainsort="nimi", sortorder=[] ) {
 
 
 //TODO LEIMAUSTAVAT AAKKOSJARJESSTYKSEEN
-/*
-for(let leimaustapa of joukkueet ){
-  if(leimaustapa == 0){
-    return leimaustapa;  
-  }
-S
+for(let joukkue of joukkueet ){
+  joukkue.leimaustapa.sort(sortLeimaustavat);
 }
 
-  else if(leimaustapa == 3){
-    return leimaustapa;
-  }
-  else if(leimaustapa == 1){
-    return leimaustapa;
-  }
-  else{
-    return leimaustapa;
-  }
-}
-*/
+console.log();
 
 for(let joukkue of joukkueet){
 
- joukkue.jasenet.sort((a, b) => a.localeCompare(b, 'fi', {sensitivity: 'base'}));
-
+  joukkue.jasenet.sort((a, b) => a.localeCompare(b, 'fi', {sensitivity: 'base'}));
 }
 
 if (mainsort == "nimi"){
 
   joukkueet.sort(sortTeams);
-
 }
 
 if(mainsort == "sarja"){
 
   joukkueet.sort(compareSarja);
-   
 }
+
 if(mainsort == "aika"){
 
   joukkueet.sort(sortTime);
-
 }
 
-
-//TODO
 if(mainsort == "pisteet"){
+  for(let i = 0; i < joukkueet.length-1;i++){
+    if(joukkueet[i]['pisteet'] < joukkueet[i+1]['pisteet']  ){
+    }
+  }
 }
-//TODO
+
+
 if(mainsort == "matka"){
+  for(let i = 0; i < joukkueet.length-1;i++){
+    if(joukkueet[i]['matka'] < joukkueet[i+1]['matka']  ){
+    }
+  }
 }
+
 
 console.log();
 
@@ -483,6 +471,34 @@ return joukkueet;
 }
 
 
+function compareNumbers(number1, number2)
+{
+  return number1 - number2;
+}
+
+
+
+function sortLeimaustavat(leima){
+
+  for (let i = 0; i < leima.length; i++){
+    if (leima[0] == 0 || leima[0] == 1 || leima[0] == 2 || leima[0] == 3 ){
+      return 0;
+    }
+    if(leima[1] == 0 || leima[0] == 1 || leima[0] == 2 || leima[0] == 3 ){
+      return 3;
+    }
+    if(leima[2] == 0 || leima[0] == 1 || leima[0] == 2 || leima[0] == 3 ){
+      return 1;
+    }
+    else{
+      return 2;
+    }
+  }
+
+}
+
+console.log();
+ 
 /**
  * Apufunktio, joka vertailee joukkeuiden sarjojen nimiä.
  * 
@@ -520,13 +536,8 @@ function sortTeams(key1, key2) {
  * @returns  Palauttaa pienemmän ajan.
  */
 function sortTime(aika1, aika2){
-return aika1.aika.localeCompare(aika2.aika);
+  return aika1.aika.localeCompare(aika2.aika);
 }
-
-
-
-
-
 
 
 /**
@@ -534,8 +545,9 @@ return aika1.aika.localeCompare(aika2.aika);
   * Laskee joukkueen kulkeman matkan. Matka tallennetaan joukkue.matka-ominaisuuteen liukulukuna
   * Laske kuinka pitkän matkan kukin joukkue on kulkenut eli laske kunkin rastivälin
   * pituus ja laske yhteen kunkin joukkueen kulkemat rastivälit. Jos rastille ei löydy
-  * sijaintitietoa (lat ja lon), niin kyseistä rastia ei lasketa matkaan mukaan. Matka
-  * lasketaan viimeisestä LAHTO-rastilla tehdystä leimauksesta alkaen aina
+  * sijaintitietoa (lat ja lon), niin kyseistä rastia ei lasketa matkaan mukaan.
+  * 
+  * Matka lasketaan viimeisestä LAHTO-rastilla tehdystä leimauksesta alkaen aina
   * ensimmäiseen MAALI-rastilla tehtyyn leimaukseen asti. Leimauksia jotka tehdään
   * ennen lähtöleimausta tai maalileimauksen jälkeen ei huomioida.
   * Käytä annettua apufunktiota getDistanceFromLatLonInKm
@@ -543,8 +555,132 @@ return aika1.aika.localeCompare(aika2.aika);
   * @return {Object} joukkue
   */
 function laskeMatka(joukkue) {
+
+  let secondLat, secondLon, thirdLat, thirdLon,
+   firstLat, firstLon, midDist, lastLon, tulos, firstDist, index;
+
+  let duplicates = 0;
+  //etäisyys ensimmäisen rastin ja taoisen rastin kanssa
+  for(let i = 0; i < joukkue.rastileimaukset.length-1;i++){
+    if(joukkue.rastileimaukset[i].rasti != null) {
+      if(joukkue.rastileimaukset[i].rasti.koodi == "LAHTO" && duplicates == 0) {
+        
+        duplicates ++;
+      }
+      if(joukkue.rastileimaukset[i].rasti.koodi == "LAHTO" && duplicates == 1) {
+
+        firstLat =  parseFloat(joukkue.rastileimaukset[i].rasti['lat']);
+        firstLon = parseFloat(joukkue.rastileimaukset[i].rasti['lon']);
+      
+      if(joukkue.rastileimaukset[i + 1].rasti.koodi != "LAHTO" && duplicates == 1) {
+
+       index = joukkue.rastileimaukset[i + 1];
+
+        secondLat =  parseFloat(joukkue.rastileimaukset[i + 1].rasti['lat']);
+        secondLon = parseFloat(joukkue.rastileimaukset[i + 1].rasti['lon']);
+        // etäisyys ensimmäisen leimauksen ja seuraavan välillä
+        firstDist = getDistanceFromLatLonInKm(firstLat,firstLon,secondLat,secondLon);
+        duplicates++;
+      console.log(joukkue.nimi + " " + firstDist);
+   
+      }
+      }
+    }
+    }
+/*
+  for(let i = index; i < joukkue.rastileimaukset.length-1;i++){
+      if(joukkue.rastileimaukset[i].rasti != null && joukkue.rastileimaukset[i].rasti.koodi != "MAALI") {
+
+        firstLat = secondLat;
+        firstLon = secondLon;
+
+      }
+
+      if(joukkue.rastileimaukset[i + 1].rasti != null && joukkue.rastileimaukset[i + 1].rasti.koodi != "MAALI") {
+
+      secondLat = parseFloat(joukkue.rastileimaukset[i + 1].rasti['lat']);
+      secondLon = parseFloat(joukkue.rastileimaukset[i + 1].rasti['lon']);
+
+      
+      }
+      midDist = getDistanceFromLatLonInKm(firstLat,firstLon,secondLat,secondLon);
+      console.log(joukkue.nimi + " "+ "midDIst: "+midDist);
+  }
+    //console.log("kuumaa makkaraa");
+/*
+//etäisyys muiden rastien kanssa
+  for(let i = 0; i < joukkue.rastileimaukset.length-1;i++){ 
+    if(joukkue.rastileimaukset[i].rasti != null && duplicates != 2) {
+
+      let firstLat =  parseFloat(joukkue.rastileimaukset[i].rasti['lat']);
+      let firstLon = parseFloat(joukkue.rastileimaukset[i].rasti['lon']);
+      
+
+    
+
+    if(joukkue.rastileimaukset[i+1].rasti != null && duplicates != 2) {
+
+      let secondLat =  parseFloat(joukkue.rastileimaukset[i + 1].rasti['lat']);
+      let secondLon = parseFloat(joukkue.rastileimaukset[i + 1].rasti['lon']);
+      
+      tulos = getDistanceFromLatLonInKm(firstLat,firstLon,secondLat,secondLon);
+      console.log(joukkue.nimi + " " + tulos);
+    }
+    }
+
+    
+  }
+  */
   return joukkue;
 }
+  
+
+    
+
+//console.log("yeaaa"+getDistanceFromLatLonInKm(62.134123,25.682473,62.134123)+getDistanceFromLatLonInKm(62.086189,25.695688,62.100413,25.728135)+getDistanceFromLatLonInKm(62.128162,25.724837,62.093545,25.716227)+getDistanceFromLatLonInKm(62.098636,25.691051,62.102194,25.673997)+getDistanceFromLatLonInKm(62.115241,25.743788,62.109962,25.728800));
+
+    /*
+    if(joukkue.rastileimaukset[i].rasti != null) {
+      if(joukkue.rastileimaukset[i].rasti.koodi != "LAHTO" && joukkue.rastileimaukset[i].rasti.koodi != "MAALI" && joukkue.rastileimaukset[i] > index){
+
+            thirdLat =  parseFloat(joukkue.rastileimaukset[i].rasti['lat']);
+            thirdLon = parseFloat(joukkue.rastileimaukset[i].rasti['lon']);
+        
+        if(joukkue.rastileimaukset[i].rasti.koodi != "LAHTO" && joukkue.rastileimaukset[i].rasti['lat'] != thirdLat && joukkue.rastileimaukset[i].rasti['lon'] != thirdLon){
+
+          fourthLat =  parseFloat(joukkue.rastileimaukset[i].rasti['lat']);
+          fourthLon = parseFloat(joukkue.rastileimaukset[i].rasti['lon']);
+
+          tulos = firstDist + getDistanceFromLatLonInKm(thirdLat,thirdLon,fourthLat,fourthLon);
+          console.log(joukkue.nimi + " " + tulos);
+        }
+      }  
+    }
+
+
+
+
+}
+
+*/
+  /*
+    
+    
+    
+
+*/
+ 
+/*
+    if(rastileimaus.rasti != null) {
+      if(rastileimaus.rasti.koodi == "MAALI"){
+        lastLat = rastileimaus.rasti['lat'];
+        lastLon = rastileimaus.rasti['lon'];
+
+       
+          
+      }
+    }
+*/
 
 /**
   * Taso 5
@@ -566,6 +702,7 @@ function laskeMatka(joukkue) {
   * @return {Object} joukkue
   */
 function laskePisteet(joukkue) {
+
   return joukkue;
 }
 
