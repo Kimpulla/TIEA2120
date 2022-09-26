@@ -232,6 +232,13 @@ function compareRastit(a, b) {
  * @return {Object} palauttaa muutetun alkuperäisen data-tietorakenteen
  */
 function lisaaJoukkue(data, nimi, leimaustavat, sarja, jasenet) {
+
+let taulukko = [];
+
+for (let leima of leimaustavat){
+  taulukko.push(data.leimaustavat.indexOf(leima));
+}
+
   if (
     !data.joukkueet.some((joukkue) => joukkue.nimi === nimi) &&
     whitespaceCheck(nimi) == false &&
@@ -245,9 +252,9 @@ function lisaaJoukkue(data, nimi, leimaustavat, sarja, jasenet) {
         nimi: nimi,
         pisteet: 0,
         matka: 0,
-        id: generateId(100000),
+        id: generateId(),
         jasenet: jasenet,
-        leimaustapa: leimaustavat,
+        leimaustapa:taulukko,
         rastileimaukset: [],
         sarja: palautaSarja(data.sarjat, sarja),
         aika: "00:00:00",
@@ -402,13 +409,13 @@ function jarjestaJoukkueet(data, mainsort = "nimi", sortorder = []) {
   // rikkoo joukkueen lisäämisen data.tietokantaan.
   // Tämän function alapuolella on apufunctio compareLeima, joka avusti prosessissa.
   // Rivi: 455.
-  /*
+  
   for (let joukkue of joukkueet) {
     joukkue.leimaustapa.sort((a, b) => {
       return compareLeima(a, b, data.leimaustavat);
     });
   }
-  */
+  
 
   for (let joukkue of joukkueet) {
     joukkue.jasenet.sort((a, b) =>
@@ -451,13 +458,13 @@ function jarjestaJoukkueet(data, mainsort = "nimi", sortorder = []) {
   return joukkueet;
 }
 
-/*
+
 function compareLeima(leima1, leima2, leimaustavat) {
   return leimaustavat[leima1].localeCompare(leimaustavat[leima2], "fi", {
     sensitivity: "base",
   });
 }
-*/
+
 
 /**
  * Apufunktio, joka vertailee joukkeuiden sarjojen nimiä.
