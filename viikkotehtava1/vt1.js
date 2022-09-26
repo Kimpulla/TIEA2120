@@ -450,23 +450,11 @@ function jarjestaJoukkueet(data, mainsort = "nimi", sortorder = []) {
   }
 
   if (mainsort == "pisteet") {
-    for (let i = 0; i < joukkueet.length - 1; i++) {
-      if (joukkueet[i]["pisteet"] < joukkueet[i + 1]["pisteet"]) {
-        return joukkueet[i]["pisteet"];
-      }
-    }
+    joukkueet.sort((a, b) => a.pisteet - b.pisteet);
   }
 
   if (mainsort == "matka") {
-
-  for (let i = 0; i < joukkueet.length-1 ; i++) {
-    for (let j = 1; j < joukkueet.length-1 ; j++) {
-    if (joukkueet[i]["matka"] < joukkueet[j]["matka "]) {
-      return joukkueet[i]["matka"];
-    }
-
-  }
-  }
+    joukkueet.sort((a, b) => a.matka - b.matka);
   }
 
   return joukkueet;
