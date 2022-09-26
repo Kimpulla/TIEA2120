@@ -91,7 +91,7 @@ function lisaaSarja(data, nimi, kesto, alkuaika, loppuaika) {
   ) {
     let id = generateId();
     // Tarkistetaan onko id jo olemassa, jos on luodaan uusi id.
-    while (findId(data.sarjat, id) == true) {
+    while (findSarjaId(data.sarjat, id) == true) {
       id = generateId();
     }
 
@@ -117,8 +117,22 @@ function lisaaSarja(data, nimi, kesto, alkuaika, loppuaika) {
  * @param {String} input
  * @returns true, jos input löytyy taulukosta.
  */
-function findId(arr, input) {
+function findSarjaId(arr, input) {
   if (arr.some((sarja) => sarja.id === parseInt(input))) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Apumetodi, jolla selvitetään onko id data.joukkueet taulukossa.
+ *
+ * @param {Array} arr
+ * @param {String} input
+ * @returns true, jos input löytyy taulukosta.
+ */
+ function findJoukkueId(arr, input) {
+  if (arr.some((joukkue) => joukkue.id === parseInt(input))) {
     return true;
   }
   return false;
@@ -234,10 +248,16 @@ function compareRastit(a, b) {
 function lisaaJoukkue(data, nimi, leimaustavat, sarja, jasenet) {
 
 let taulukko = [];
+let idee = generateId();
 
+//Hajoaa, jos löytyy sellainen leima mitä ei ole data.leimaustavat taulukossa.
 for (let leima of leimaustavat){
   taulukko.push(data.leimaustavat.indexOf(leima));
 }
+
+  while(findJoukkueId(data.joukkueet, data.joukkue) == idee){
+    idee++;
+  }
 
   if (
     !data.joukkueet.some((joukkue) => joukkue.nimi === nimi) &&
@@ -245,14 +265,14 @@ for (let leima of leimaustavat){
     leimaustavat.length >= 1 &&
     jasenet.length >= 2 &&
     hasDuplicates(jasenet) == false &&
-    findId(data.sarjat, sarja) == true
+    findSarjaId(data.sarjat, sarja) == true
   ) {
     try {
       let newTeam = {
         nimi: nimi,
         pisteet: 0,
         matka: 0,
-        id: generateId(),
+        id: idee,
         jasenet: jasenet,
         leimaustapa:taulukko,
         rastileimaukset: [],
@@ -280,7 +300,7 @@ for (let leima of leimaustavat){
 function palautaSarja(arr, input) {
   let index;
 
-  if (findId(arr, input) == true) {
+  if (findSarjaId(arr, input) == true) {
     index = arr.map((object) => object.id).indexOf(parseInt(input));
   }
   return arr[index];
@@ -403,13 +423,7 @@ function jarjestaJoukkueet(data, mainsort = "nimi", sortorder = []) {
 
     return a;
   });
-  
-  // Updated 26.9.2022 02.14
-  // Tässä olisi leimaustapojen järjestäminen, mutta yllätykseksi sen ajaminen
-  // rikkoo joukkueen lisäämisen data.tietokantaan.
-  // Tämän function alapuolella on apufunctio compareLeima, joka avusti prosessissa.
-  // Rivi: 455.
-  
+
   for (let joukkue of joukkueet) {
     joukkue.leimaustapa.sort((a, b) => {
       return compareLeima(a, b, data.leimaustavat);
@@ -520,11 +534,41 @@ function sortTime(aika1, aika2) {
  */
 function laskeMatka(joukkue) {
 
+  let firstTime, startTime;
   let secondLat, secondLon, firstLat, firstLon, midDist, firstDist, index;
 
   let tulos = 0;
-
   let duplicates = 0;
+  let taulukko = [];
+  let aikaTulos = 0;
+
+  // Otetaan rastileimausten ajat välin jälkeen, jätetään huomiotta nyt päivämäärä.
+  // Oletetaan, että tehokkaita suunnistajia ja ei vie useampaa päivää.
+  for (let leimaus of joukkue.rastileimaukset) {
+    if (leimaus.rasti != null) {
+        firstTime = leimaus.aika;
+        startTime = firstTime.substring(firstTime.indexOf(" ") + 1);
+      }
+    }
+try {
+    //katkaistaan ":" kohdalta
+    let beginning = startTime.split(":");
+
+    //muutetaan sekunneiksi
+    let seconds = beginning[0] * 3600 + beginning[1] * 60 + beginning[2];
+
+    let date = new Date(2017, 3, 18);
+    date.setSeconds(seconds);
+
+    //otetaan vain kaksi merkitsevää lukua.
+    aikaTulos = date.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
+    //Lisätään ajat taulukkoon.
+    taulukko.push(aikaTulos);
+
+  } catch (error) {}
+
+  //Järjestetään taulukko.
+  taulukko.sort(sortTime);
 
   //etäisyys ensimmäisen rastin ja taoisen rastin kanssa
   for (let i = 0; i < joukkue.rastileimaukset.length - 1; i++) {
