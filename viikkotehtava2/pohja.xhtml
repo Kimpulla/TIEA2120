@@ -15,6 +15,40 @@
 
 <!-- Tähän tulee ykköstasolla taulukko sarjoista ja joukkueista. -->
 
+<table>
+  <caption>Tulokset</caption>
+  <tr>
+      <th>Sarja</th>
+      <th>Joukkue</th>
+  </tr>
+  <tr>
+      <td>2h</td>
+      <td>Joukkue 2</td>
+  </tr>
+  <tr>
+      <td>2h</td>
+      <td>Joukkue 5</td>
+  </tr>
+  <tr>
+      <td>4h</td>
+      <td>Joukkue 1</td>
+  </tr>
+  <tr>
+      <td>4h</td>
+      <td>Joukkue 8</td>
+  </tr>
+  <tr>
+      <td>8h</td>
+      <td>Joukkue 3</td>
+  </tr>
+  <tr>
+      <td>8h</td>
+      <td>Joukkue 4</td>
+  </tr>
+</table>
+
+
+
 <!--
 
 Tulokset ovat ensisijaisesti sarjoittain aakkosjärjestyksessä ja 
@@ -36,6 +70,31 @@ Lat täytyy olla numero
 Lon täytyy olla numero
 Jos kaikkia tietoja ei ole täytetty oikein, niin lisäystä ei tehdä.
 -->
+
+<form action="" method="">
+
+  <fieldset>
+  <legend>Rastin tiedot</legend> 
+  <p>
+    <label for="lat">Lat</label> 
+    <input id="lat" type="number" step="any" name="lat" value="" title=""/>
+  </p>
+  
+  <p>
+    <label for="lon">Lon</label>
+    <input id="lon" type="number" step="any" name="lon" value="" title=""/>
+  </p>
+
+  <p>
+    <label for="koodi">Koodi</label> 
+    <input id="koodi" type="text" name="koodi" value="" title="" />
+  </p>
+
+  <p><input type="submit" value="Lisää rasti" /></p>
+  </fieldset>
+  
+  
+  </form>
 
 <h2>Joukkue</h2>
         
