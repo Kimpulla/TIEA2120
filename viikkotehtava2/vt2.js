@@ -22,6 +22,12 @@ function start(data) {
         // dataa voi tutkia myös osoitteesta: https://appro.mit.jyu.fi/cgi-bin/tiea2120/randomize.cgi
         // huom. datan sisältö muuttuu hieman jokaisella latauskerralla
 
+        let joukkueTaulukko = [];
+        joukkueet();
+
+       // korvaaTulokset();
+
+
 	console.log(data);
 
 	console.log(data.documentElement);
@@ -35,7 +41,7 @@ function start(data) {
         let otsikko = document.documentElement.getElementsByTagName('h1');
         otsikko[0].appendChild(p);
 
-        joukkueet();
+        
  
         // savedata tallentaa datan selaimen LocalStorageen. Tee tämä aina, kun
         // ohjelmasi on muuttanut dataa. Seuraavalla sivun latauskerralla
@@ -48,25 +54,81 @@ function start(data) {
  */
 function joukkueet(){
         let joukkueet = data.documentElement.getElementsByTagName("joukkue");
-        let joukkueTaulukko = [];
+        let sarjat = data.documentElement.getElementsByTagName("sarja");
+
         for (let joukkue of joukkueet) {
                 let jou = {
-                "aika": joukkue.getAttribute("aika"),
-                "matka": joukkue.getAttribute("matka"),
-                "pisteet": joukkue.getAttribute("pisteet"),
-                "sarja": joukkue.getAttribute("sarja"),
-                "nimi": joukkue.getElementsByTagName("nimi")[0].textContent
+                //"aika": joukkue.getAttribute("aika"),
+                //"matka": joukkue.getAttribute("matka"),
+                //"pisteet": joukkue.getAttribute("pisteet"),
+                "Sarja": joukkue.getAttribute("sarja"),
+                "Joukkue": joukkue.getElementsByTagName("nimi")[0].textContent
         };
-        joukkueTaulukko.push(jou);
-            
+        joukkueTaulukko.push(jou);      
+}
+        for (let joukkue of joukkueTaulukko){
+                if (joukkue["sarja"] ){
+
+                }
+        }
+console.log();
 }
 
 
-        console.log(("omaT: "+joukkueTaulukko));
+
+let table = document.querySelector("table");
+let data1 = joukkueTaulukko;
+let th = Object.keys(joukkueTaulukko[0]);
+createTable(table, data1);
+createTableHead(table, th);
+
+
+
+//all good
+function createTableHead(table,th) {
+        let thead = table.createTHead();
+        let row = thead.insertRow();
+        for (let key of th) {
+                let th = document.createElement("th");
+                let text = document.createTextNode(key);
+                th.appendChild(text);
+                row.appendChild(th);
+              }
 }
 
 
+
+function createTable(table, data1) {
+        for (let element of data1) {
+          let row = table.insertRow();
+          for (let key in element) {
+            let cell = row.insertCell();
+            let text = document.createTextNode(element[key]);
+            cell.appendChild(text);
+          }
+          //console.log();
+        }
+        
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
 
 
 
