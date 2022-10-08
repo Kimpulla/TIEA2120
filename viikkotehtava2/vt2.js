@@ -23,7 +23,11 @@ function start(data) {
         // huom. datan sisältö muuttuu hieman jokaisella latauskerralla
 
         let joukkueTaulukko = [];
+        let sarjaTaulukko = [];
         joukkueet();
+        sarjat();
+        editJoukkueet();
+        
 
        // korvaaTulokset();
 
@@ -34,28 +38,45 @@ function start(data) {
 	console.log(data.documentElement.getElementsByTagName("joukkue"));
         console.log(data.documentElement.getElementsByTagName("sarja"));
 
-        //console.log(getSarjaById("6995217"));
-
-        let p = document.createElement('p');
-        p.textContent = "tesingss11";
-        let otsikko = document.documentElement.getElementsByTagName('h1');
-        otsikko[0].appendChild(p);
-
         
- 
         // savedata tallentaa datan selaimen LocalStorageen. Tee tämä aina, kun
         // ohjelmasi on muuttanut dataa. Seuraavalla sivun latauskerralla
         // saat käyttöösi muuttamasi datan
 	savedata(data);
 
 /**
- * Luodaan taulukko joukkueista.
+ * Funktiolla luodaan taulukko sarjoista.
+ * Esim.
+ * sarjatTaulukko = [{alkuaika:"", id:"13", kesto:"3", loppuaika:"", nimi:"4h"}]
+ * 
+ */
+ function sarjat(){
+
+        let sarjat = data.documentElement.getElementsByTagName("sarja");
+        for (let sarja of sarjat) {
+                let sarj = {
+                "alkuaika": sarja.getAttribute("alkuaika"),
+                "id": sarja.getAttribute("id"),
+                "kesto": sarja.getAttribute("kesto"),
+                "loppuaika": sarja.getAttribute("loppuaika"),
+                "nimi": sarja.getElementsByTagName("nimi")[0].textContent
+        };
+        sarjaTaulukko.push(sarj);      
+        }
+console.log();
+}
+
+
+
+/**
+ * Funktiolla luodaan taulukko joukkueista.
+ * Esim.
+ * joukkueetTaulukko = [{aika:"", matka:"13",..., Joukkue:"ukkelit"}]
  * 
  */
 function joukkueet(){
-        let joukkueet = data.documentElement.getElementsByTagName("joukkue");
-        let sarjat = data.documentElement.getElementsByTagName("sarja");
 
+        let joukkueet = data.documentElement.getElementsByTagName("joukkue");
         for (let joukkue of joukkueet) {
                 let jou = {
                 //"aika": joukkue.getAttribute("aika"),
@@ -65,13 +86,39 @@ function joukkueet(){
                 "Joukkue": joukkue.getElementsByTagName("nimi")[0].textContent
         };
         joukkueTaulukko.push(jou);      
-}
-        for (let joukkue of joukkueTaulukko){
-                if (joukkue["sarja"] ){
-
-                }
         }
 console.log();
+}
+
+
+function editJoukkueet(){
+
+        for (let joukkue of joukkueTaulukko){
+                for (let sarja of sarjaTaulukko){
+                if(joukkue["Sarja"] == sarja["id"]){
+                        joukkue["Sarja"] = sarja["nimi"];
+                }
+                else{
+                        //console.log( "joukkueen ID:"+ joukkue["Sarja"] +
+                        //":n ID ei ole sama kuin sarjan ID:"+sarja["id"]); 
+                }
+               
+                } 
+        }
+        //Poistetaan whitepsacet joukkueen nimen alusta ja lopusta.
+        for(let joukkue of joukkueTaulukko){
+                if (/\s/.test(joukkue["Joukkue"])) {
+                
+                        let word = joukkue["Joukkue"];
+                        let result = word.trim();
+                        joukkue["Joukkue"]=result;
+                }
+
+        
+         }
+         //Kutsutaan compareJoukkue ja järjestetään joukkueet aakkosjärjestykseen.
+         
+         console.log(joukkueTaulukko.sort(compareJoukkue));
 }
 
 
@@ -109,20 +156,7 @@ function createTable(table, data1) {
           //console.log();
         }
         
-      }
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 
@@ -130,6 +164,33 @@ function createTable(table, data1) {
 }
 
 
+
+ /** 
+ * Apufunktio, joka vertailee joukkeuiden nimiä.
+ *
+ * @param {*} joukkue1
+ * @param {*} joukkue2
+ * @returns -1, 0 tai 1
+ */
+
+ function compareJoukkue(joukkue1, joukkue2) {
+
+        if (joukkue1["Sarja"].toLowerCase() < joukkue2["Sarja"].toLowerCase()) {
+                return -1;
+        }
+        if (joukkue1["Sarja"].toLowerCase() > joukkue2["Sarja"].toLowerCase()) {
+                return 1;
+        }
+        if (joukkue1["Joukkue"].toLowerCase() < joukkue2["Joukkue"].toLowerCase()) {
+                return -1;
+        }
+        if (joukkue1["Joukkue"].toLowerCase() > joukkue2["Joukkue"].toLowerCase()) {
+                return 1;
+        }
+        return 0;
+}
+
+ 
 
 
 function korvaaJoukkue(){
