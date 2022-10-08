@@ -24,8 +24,10 @@ function start(data) {
 
         let joukkueTaulukko = [];
         let sarjaTaulukko = [];
+        let rastiTaulukko = [];
         joukkueet();
         sarjat();
+        rastit();
         editJoukkueet();
         
 
@@ -37,6 +39,7 @@ function start(data) {
 	console.log(data.documentElement);
 	console.log(data.documentElement.getElementsByTagName("joukkue"));
         console.log(data.documentElement.getElementsByTagName("sarja"));
+        console.log(data.documentElement.getElementsByTagName("rastit"));
 
         
         // savedata tallentaa datan selaimen LocalStorageen. Tee tämä aina, kun
@@ -88,6 +91,29 @@ function joukkueet(){
         joukkueTaulukko.push(jou);      
         }
 console.log();
+}
+
+
+/**
+ * Funktiolla luodaan taulukko rasteista.
+ * Esim.
+ * rastitTaulukko = [{id:"12345", koodi:"13", lat:"62.34", lon:"25.324"}]
+ * 
+ */
+ function rastit(){
+
+        let rastit = data.documentElement.getElementsByTagName("rasti");
+        for (let rasti of rastit) {
+                let ras = {
+                "id": rasti.getAttribute("id"),
+                "koodi": rasti.getAttribute("koodi"),
+                "lat": rasti.getAttribute("lat"),
+                "lon": rasti.getAttribute("lon")
+                
+        };
+        rastiTaulukko.push(ras);      
+        }
+console.log(rastiTaulukko);
 }
 
 
