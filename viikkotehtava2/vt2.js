@@ -35,7 +35,7 @@ function start(data) {
         let otsikko = document.documentElement.getElementsByTagName('h1');
         otsikko[0].appendChild(p);
 
-        joukkue();
+        joukkueet();
  
         // savedata tallentaa datan selaimen LocalStorageen. Tee tämä aina, kun
         // ohjelmasi on muuttanut dataa. Seuraavalla sivun latauskerralla
@@ -43,10 +43,10 @@ function start(data) {
 	savedata(data);
 
 /**
- * Luodaan taulukko joukkeista.
+ * Luodaan taulukko joukkueista.
  * 
  */
-function joukkue(){
+function joukkueet(){
         let joukkueet = data.documentElement.getElementsByTagName("joukkue");
         let joukkueTaulukko = [];
         for (let joukkue of joukkueet) {
@@ -55,12 +55,14 @@ function joukkue(){
                 "matka": joukkue.getAttribute("matka"),
                 "pisteet": joukkue.getAttribute("pisteet"),
                 "sarja": joukkue.getAttribute("sarja"),
-                "nimi": joukkue.getElementsByTagName("nimi")
+                "nimi": joukkue.getElementsByTagName("nimi")[0].textContent
         };
         joukkueTaulukko.push(jou);
-                
+            
 }
-        console.log(JSON.parse(JSON.stringify("omaT: "+joukkueTaulukko)));
+
+
+        console.log(("omaT: "+joukkueTaulukko));
 }
 
 
