@@ -42,6 +42,7 @@ function start(data) {
 
         // Luodaan rastiTaulukosta taulukko, jotta sitä voidaan iteroida.
         let rastitIteroitava = rastiTaulukko.map(a => a.koodi);
+        rastitIteroitava.sort(compareRastit);
         console.log("rastitIteroitava");
         console.log(rastitIteroitava);    
 
@@ -222,7 +223,30 @@ return list;
 
 }
 
-
+/**
+ * Apumetodi compareRastit, järjestää rastit.
+ *
+ * @param {String} a
+ * @param {String} b
+ * @returns  rastit oikeassa järjestyksessä.
+ */
+ function compareRastit(a, b) {
+        let tulos = a.localeCompare(b, "fi", { sensitivity: "base" });
+      
+        if (a.replace(/[0-9]/g, "").length >= 2) {
+          if (b.replace(/[0-9]/g, "").length >= 2) {
+            return tulos;
+          }
+          return 1;
+        } else {
+          if (b.replace(/[0-9]/g, "").length >= 2) {
+            return -1;
+          }
+        }
+      
+        return tulos;
+      }
+      
 
  /** 
  * Apufunktio, joka vertailee joukkeuiden nimiä.
