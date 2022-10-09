@@ -162,6 +162,8 @@ function editJoukkueet(){
                         joukkue["Joukkue"]=result;
                 }
          }
+         // Järjestetään joukkueet.
+         joukkueTaulukko.sort(compareJoukkue);
 }
 
 
@@ -353,3 +355,7 @@ function checkId(id){
         }
         return 0;
 }
+
+ 
+
+
