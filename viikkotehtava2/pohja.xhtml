@@ -40,26 +40,29 @@ Lon täytyy olla numero
 Jos kaikkia tietoja ei ole täytetty oikein, niin lisäystä ei tehdä.
 -->
 
-<form action="" method="">
+
+
+
+<form id="lomake" action="#">
 
   <fieldset>
   <legend>Rastin tiedot</legend> 
-  <p>
-    <label for="lat">Lat</label> 
-    <input id="lat" type="number" step="any" name="lat" value="" title=""/>
-  </p>
-  
-  <p>
-    <label for="lon">Lon</label>
-    <input id="lon" type="number" step="any" name="lon" value="" title=""/>
-  </p>
+    <p>
+      <label for="lat">Lat</label> 
+      <input id="lat" type="text" name="lat" required="required"/>
+    </p>
+    
+    <p>
+      <label for="lon">Lon</label>
+      <input id="lon" type="text" name="lon" required="required"/>
+    </p>
 
-  <p>
-    <label for="koodi">Koodi</label> 
-    <input id="koodi" type="text" name="koodi" value="" title="" />
-  </p>
+    <p>
+      <label for="koodi">Koodi</label> 
+      <input id="koodi" type="text" name="koodi" required="required"/>
+    </p>
 
-  <p><input type="submit" value="Lisää rasti" /></p>
+    <p><input type="submit" name ="Lisaa" value="Lisää rasti" /></p>
   </fieldset>
   
   
