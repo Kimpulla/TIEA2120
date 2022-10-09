@@ -1,0 +1,13 @@
+form{
+    width: 35ch;
+}
+
+#submit input{
+    border-radius: 0px;
+    float: left;
+}
+
+input{
+    float: right;
+    margin-right: 1.5em;
+}
