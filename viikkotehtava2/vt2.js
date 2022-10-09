@@ -193,6 +193,10 @@ function createTableHead(table,th) {
  * @param {Array} data1 - taulukko
  */
 function createTable(table, data1) {
+        
+        let caption = table.createCaption();
+        caption.textContent = "Tulokset";
+
         for (let element of data1) {
           let row = table.insertRow();
           for (let key in element) {
