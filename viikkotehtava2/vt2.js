@@ -29,9 +29,25 @@ function start(data) {
         sarjat();
         rastit();
         editJoukkueet();
-        
+       
 
-       // korvaaTulokset();
+
+        // Table.
+        let table = document.querySelector("table");
+        let data1 = joukkueTaulukko;
+        let th = Object.keys(joukkueTaulukko[0]);
+        createTable(table, data1);
+        createTableHead(table, th);
+
+
+        // Luodaan rastiTaulukosta taulukko, jotta sitä voidaan iteroida.
+        let rastitIteroitava = rastiTaulukko.map(a => a.koodi);
+        console.log("rastitIteroitava");
+        console.log(rastitIteroitava);    
+
+        document.getElementById("rastit").appendChild(createRastitList(rastiTaulukko[0]));
+        createRastitList(rastiTaulukko.set0);       
+ 
 
 
 	console.log(data);
@@ -105,10 +121,10 @@ console.log();
         let rastit = data.documentElement.getElementsByTagName("rasti");
         for (let rasti of rastit) {
                 let ras = {
-                "id": rasti.getAttribute("id"),
-                "koodi": rasti.getAttribute("koodi"),
-                "lat": rasti.getAttribute("lat"),
-                "lon": rasti.getAttribute("lon")
+                //"id": rasti.getAttribute("id"),
+                //"lat": rasti.getAttribute("lat"),
+                //"lon": rasti.getAttribute("lon"),
+                "koodi": rasti.getAttribute("koodi")
                 
         };
         rastiTaulukko.push(ras);      
@@ -149,13 +165,6 @@ function editJoukkueet(){
 
 
 
-let table = document.querySelector("table");
-let data1 = joukkueTaulukko;
-let th = Object.keys(joukkueTaulukko[0]);
-createTable(table, data1);
-createTableHead(table, th);
-
-
 
 //all good
 function createTableHead(table,th) {
@@ -183,6 +192,30 @@ function createTable(table, data1) {
         }
         
 }
+
+
+function createRastitList(objArray) {
+        // Luodaan ul -elementti.
+        let list = document.createElement("ul");
+       
+        for (let rasti of rastitIteroitava) {
+                // Luodaan li -elementti.
+                let item = document.createElement("li");
+                
+                // Asetetaan li -elentille sisältö.
+                item.appendChild(document.createTextNode(rasti));
+                
+                // Asetetaan li -elementti ul- elementin lapsoseksi.
+                list.appendChild(item);
+        }
+return list;
+}
+            
+    
+
+
+   
+
 
 
 
