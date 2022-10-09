@@ -22,9 +22,12 @@ function start(data) {
         // dataa voi tutkia myös osoitteesta: https://appro.mit.jyu.fi/cgi-bin/tiea2120/randomize.cgi
         // huom. datan sisältö muuttuu hieman jokaisella latauskerralla
 
+        // Määritetään taulukkoja.
         let joukkueTaulukko = [];
         let sarjaTaulukko = [];
         let rastiTaulukko = [];
+
+        // Kutsutaan funktioita.
         joukkueet();
         sarjat();
         rastit();
@@ -42,20 +45,17 @@ function start(data) {
 
         // Luodaan rastiTaulukosta taulukko, jotta sitä voidaan iteroida.
         let rastitIteroitava = rastiTaulukko.map(a => a.koodi);
-        rastitIteroitava.sort(compareRastit);
-        console.log("rastitIteroitava");
-        console.log(rastitIteroitava);    
-
+        rastitIteroitava.sort(compareRastit); 
         document.getElementById("rastit").appendChild(createRastitList(rastiTaulukko[0]));
         createRastitList(rastiTaulukko.set0);       
  
 
 
-	console.log(data);
+	//console.log(data);
 
-	console.log(data.documentElement);
-	console.log(data.documentElement.getElementsByTagName("joukkue"));
-        console.log(data.documentElement.getElementsByTagName("sarja"));
+	//console.log(data.documentElement);
+	//console.log(data.documentElement.getElementsByTagName("joukkue"));
+        //console.log(data.documentElement.getElementsByTagName("sarja"));
         console.log(data.documentElement.getElementsByTagName("rastit"));
 
         
@@ -107,7 +107,7 @@ function joukkueet(){
         };
         joukkueTaulukko.push(jou);      
         }
-console.log();
+        //console.log();
 }
 
 
@@ -130,10 +130,16 @@ console.log();
         };
         rastiTaulukko.push(ras);      
         }
-console.log(rastiTaulukko);
+        //console.log(rastiTaulukko);
 }
 
 
+/**
+ * Funktiolla editJoukkueet muutetaan joukkueTaulukkoa siten,
+ * että tarkistetaan onko ( joukkue["Sarja"] --> "3124" ) eli ID sama kuin
+ * sarjaTaulukon sarjan id. Jos on laitetaan tämän sarjan nimi joukkueen sarjan
+ * id:n tilalle.
+ */
 function editJoukkueet(){
 
         for (let joukkue of joukkueTaulukko){
@@ -144,8 +150,7 @@ function editJoukkueet(){
                 else{
                         //console.log( "joukkueen ID:"+ joukkue["Sarja"] +
                         //":n ID ei ole sama kuin sarjan ID:"+sarja["id"]); 
-                }
-               
+                }     
                 } 
         }
         //Poistetaan whitepsacet joukkueen nimen alusta ja lopusta.
@@ -156,18 +161,17 @@ function editJoukkueet(){
                         let result = word.trim();
                         joukkue["Joukkue"]=result;
                 }
-
-        
          }
-         //Kutsutaan compareJoukkue ja järjestetään joukkueet aakkosjärjestykseen.
-         
-         console.log(joukkueTaulukko.sort(compareJoukkue));
 }
 
 
 
 
-//all good
+/**
+ * Funktiolla createTableHead luodaan taulukon osio <thead>.
+ * @param {Element} table - table elementti.
+ * @param {Array} th - taulukko.
+ */
 function createTableHead(table,th) {
         let thead = table.createTHead();
         let row = thead.insertRow();
@@ -180,7 +184,12 @@ function createTableHead(table,th) {
 }
 
 
-
+/**
+ * Funktiolla createTable luodaan table.
+ * 
+ * @param {Element} table  - table elementti.
+ * @param {Array} data1 - taulukko
+ */
 function createTable(table, data1) {
         for (let element of data1) {
           let row = table.insertRow();
@@ -191,11 +200,15 @@ function createTable(table, data1) {
           }
           //console.log();
         }
-        
 }
 
 
-function createRastitList(objArray) {
+/**
+ * Funktiolla createRastitList luodaan ul ja li elementit rasteille.
+ * 
+ * @returns listan.
+ */
+function createRastitList() {
         // Luodaan ul -elementti.
         let list = document.createElement("ul");
        
@@ -211,17 +224,85 @@ function createRastitList(objArray) {
         }
 return list;
 }
-            
-    
+           
 
 
-   
+// Valitsee ensimmäisen form -elementin.
+let form = document.forms["lomake"];
+
+/**
+ * Asetetaan lisaa napin toimivuus, mahdollistetaan rastin lisääminen
+ * tietokantaan.
+ */
+ form.addEventListener("submit", function (e) {
+               
+        e.preventDefault(); // estetään lomakkeen lähettäminen
+        // let lomake = e.target;
+
+        //console.log("lomakkeen sisältö: ---------------------------");
+
+        let lat = document.forms.lomake[1];
+        //console.log("lat: ", lat.value);
+
+        let lon = document.forms.lomake[2];
+        //console.log("lon: ", lon.value);
+
+        let koodi = document.forms.lomake[3];
+        //console.log("koodi: ", koodi.value);
+
+        let rasti = data.createElement("rasti");
+        let idee = checkId(generateId());
+
+        rasti.setAttribute("id", idee);
+        rasti.setAttribute("lat", lat.value);
+        rasti.setAttribute("lon", lon.value);
+        rasti.setAttribute("koodi", koodi.value);
+      
+        // Lisätään dataan elementin rastit lapseksi.
+        data.getElementsByTagName("rastit")[0].appendChild(rasti);
+
+        //console.log(rasti);
+        //console.log(data.documentElement.getElementsByTagName("rastit"));
+
+        savedata(data);               
+});
 
 
+/**
+ * Funktio checkId tarkistaa onko rastin id uniikki. 
+ * Jos rastin id ei ole uniikki, lisätään siihen yksi ja käydään
+ * rastit uudestaan läpi.
+ * 
+ * @param {String} id - numero.
+ * @returns rastin id.
+ */
+function checkId(id){
 
+        let arrayT = data.documentElement.getElementsByTagName("rasti");
+        for (let rasti of arrayT){   
+                if(rasti.id == id){
+                        id++;
+                        checkId();
+                }
+                return id;
+        }
+        }
 
-
+  
 }
+
+
+
+
+/**
+ * Luo id:n päivämäärästä 1.1.1970 koodin ajamisen ajankohtaan millisekunteina.
+ *
+ * @returns {Number} - id:n.
+ */
+ function generateId() {
+        return new Date().getTime();
+      }
+      
 
 /**
  * Apumetodi compareRastit, järjestää rastit.
@@ -271,23 +352,4 @@ return list;
                 return 1;
         }
         return 0;
-}
-
- 
-
-
-function korvaaJoukkue(){
-        let joukkueet = data.documentElement.getElementsByTagName("joukkue");
-        let jnimi;
-        for(let joukkue of joukkueet){
-                if(joukkue.childNodes.nimi[""] != null){
-                        jnimi = joukkue.childNodes.nimi;
-                        console.log(jnimi);
-                }
-              //  let replace = joukkueet.getElementById("Joukkue 1");
-              //  replace.parentNode.replaceChild(document.createTextNode(jnimi), replace);
-             //   th.parentNode.replaceChild(document.createTextNode(jnimi), th);
-        }
-
-
 }
