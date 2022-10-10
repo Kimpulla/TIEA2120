@@ -44,13 +44,16 @@ function start(data) {
 
 
         // Luodaan rastiTaulukosta taulukko, jotta sitä voidaan iteroida.
+        // Hieman liian paljon välivaiheita, kun saisi paljon helpommallakin,
+        // mutta tulipahan tehtyä.
         let rastitIteroitava = rastiTaulukko.map(a => a.koodi);
         rastitIteroitava.sort(compareRastit); 
-        //rastitIteroitava.sort((a, b) => a - b);
+        console.log(rastitIteroitava);
+
 
         document.getElementById("rastit").appendChild(createRastitList(rastiTaulukko[0]));
         createRastitList(rastiTaulukko.set0);       
- 
+        
 
 
 	//console.log(data);
@@ -124,15 +127,15 @@ function joukkueet(){
         let rastit = data.documentElement.getElementsByTagName("rasti");
         for (let rasti of rastit) {
                 let ras = {
-                //"id": rasti.getAttribute("id"),
-                //"lat": rasti.getAttribute("lat"),
-                //"lon": rasti.getAttribute("lon"),
+                "id": rasti.getAttribute("id"),
+                "lat": rasti.getAttribute("lat"),
+                "lon": rasti.getAttribute("lon"),
                 "koodi": rasti.getAttribute("koodi")
                 
         };
         rastiTaulukko.push(ras);      
         }
-        //console.log(rastiTaulukko);
+        console.log(rastiTaulukko);
 }
 
 
@@ -167,8 +170,6 @@ function editJoukkueet(){
          // Järjestetään joukkueet.
          joukkueTaulukko.sort(compareJoukkue);
 }
-
-
 
 
 /**
@@ -224,7 +225,7 @@ function createRastitList() {
                 // Luodaan li -elementti.
                 let item = document.createElement("li");
                 
-                // Asetetaan li -elentille sisältö.
+                // Asetetaan li -elementille sisältö.
                 item.appendChild(document.createTextNode(rasti));
                 
                 // Asetetaan li -elementti ul- elementin lapsoseksi.
@@ -233,7 +234,6 @@ function createRastitList() {
 return list;
 }
            
-
 
 // Valitsee ensimmäisen form -elementin.
 let form = document.forms["lomake"];
@@ -258,6 +258,8 @@ let form = document.forms["lomake"];
         let koodi = document.forms.lomake[3];
         //console.log("koodi: ", koodi.value);
 
+        if (!(isNaN(Number(lat.value) )) && !(isNaN(Number(lon.value) ))){
+
         let rasti = data.createElement("rasti");
         let idee = checkId(generateId());
 
@@ -268,17 +270,12 @@ let form = document.forms["lomake"];
       
         // Lisätään dataan elementin rastit lapseksi.
         data.getElementsByTagName("rastit")[0].appendChild(rasti);
-
-        //console.log(rasti);
-        //console.log(data.documentElement.getElementsByTagName("rastit"));
-       
+      
         // Tyhjätään inputit submittauksen jälkeen.
-       lat.value = "";
-       lon.value = "";
-       koodi.value = "";
-
-        savedata(data);               
-        window.location.reload();
+        form.reset();
+        paivitaRastit();
+        savedata(data);      
+        }          
 });
 
 
@@ -300,9 +297,37 @@ function checkId(id){
                 }
                 return id;
         }
-        }
+}
+/**
+ * Funktio päivittää rasti listan.
+ */
+function paivitaRastit(){
 
-  
+        // Etsitään elementti id:n perusteella.
+        let list = document.getElementById("rastit");
+        list.textContent = ""; // Tyhjennetään div id="rastit".
+
+        // Tyhjennetään molemmat taulukot.
+        rastitIteroitava = [];
+        rastiTaulukko = [];
+
+        // Kutsutaan rastit metodia, joka täyttää rastiTaulukko taulukon.
+        rastit();
+        // Tyhjennetään jälleen div id="rastit".
+        list.textContent = "";
+
+        // Luodaan rastiTaulukosta taulukko, jotta sitä voidaan iteroida/sortata.
+        // Hieman liian paljon välivaiheita, kun saisi paljon helpommallakin,
+        // mutta tulipahan tehtyä.
+        rastitIteroitava = rastiTaulukko.map(a => a.koodi);
+        rastitIteroitava.sort(compareRastit); 
+
+        // Täytetään div id = "rastit" uudestaan.
+        list.appendChild(createRastitList(rastiTaulukko[0]));
+        createRastitList(rastiTaulukko.set0);
+        console.log();
+}
+
 }
 
 
