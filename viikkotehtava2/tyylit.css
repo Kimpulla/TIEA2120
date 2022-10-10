@@ -2,12 +2,25 @@ form{
     width: 35ch;
 }
 
-#submit input{
+input.nappi{
     border-radius: 0px;
-    float: left;
+    float:left;
 }
 
 input{
     float: right;
     margin-right: 1.5em;
+}
+
+/* Piilotetaan nuolet, jotka tulevat kun inputin tyyppi on Number*/
+/* Chrome..*/
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0; 
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance:textfield; 
 }
