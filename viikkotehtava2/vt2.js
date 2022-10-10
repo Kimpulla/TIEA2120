@@ -45,8 +45,8 @@ function start(data) {
 
         // Luodaan rastiTaulukosta taulukko, jotta sitä voidaan iteroida.
         let rastitIteroitava = rastiTaulukko.map(a => a.koodi);
-        //rastitIteroitava.sort(compareRastit); 
-        rastitIteroitava.sort((a, b) => a - b);
+        rastitIteroitava.sort(compareRastit); 
+        //rastitIteroitava.sort((a, b) => a - b);
 
         document.getElementById("rastit").appendChild(createRastitList(rastiTaulukko[0]));
         createRastitList(rastiTaulukko.set0);       
