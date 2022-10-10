@@ -45,7 +45,9 @@ function start(data) {
 
         // Luodaan rastiTaulukosta taulukko, jotta sitä voidaan iteroida.
         let rastitIteroitava = rastiTaulukko.map(a => a.koodi);
-        rastitIteroitava.sort(compareRastit); 
+        //rastitIteroitava.sort(compareRastit); 
+        rastitIteroitava.sort((a, b) => a - b);
+
         document.getElementById("rastit").appendChild(createRastitList(rastiTaulukko[0]));
         createRastitList(rastiTaulukko.set0);       
  
@@ -269,8 +271,14 @@ let form = document.forms["lomake"];
 
         //console.log(rasti);
         //console.log(data.documentElement.getElementsByTagName("rastit"));
+       
+        // Tyhjätään inputit submittauksen jälkeen.
+       lat.value = "";
+       lon.value = "";
+       koodi.value = "";
 
         savedata(data);               
+        window.location.reload();
 });
 
 
@@ -319,7 +327,8 @@ function checkId(id){
  */
  function compareRastit(a, b) {
         let tulos = a.localeCompare(b, "fi", { sensitivity: "base" });
-      
+
+
         if (a.replace(/[0-9]/g, "").length >= 2) {
           if (b.replace(/[0-9]/g, "").length >= 2) {
             return tulos;
@@ -334,7 +343,7 @@ function checkId(id){
         return tulos;
       }
       
-
+     
  /** 
  * Apufunktio, joka vertailee joukkeuiden nimiä.
  *
