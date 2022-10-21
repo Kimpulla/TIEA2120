@@ -2,3 +2,18 @@ body {
    background-color: white;
    color: black;
 }
+
+fieldset{
+   width: 30%;
+}
+
+#lomake .vasen {
+   width: 65%;
+   float: left;
+   display: block;	
+ }
+
+ #lomake .oikea{
+   float:right;
+   display:block;
+ }
