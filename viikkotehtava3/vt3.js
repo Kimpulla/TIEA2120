@@ -99,12 +99,15 @@ function lisaaRadioBox(){
     
     boxit.appendChild(label);
 
-    // Luodaan checkboxit ja tarvittavat attribuutit.
+    // Luodaan radiobuttonit ja tarvittavat attribuutit.
     let cbox = document.createElement("input");
     cbox.type = "radio";
     cbox.name = "rg";
-    cbox.id = sarja.nimi;
+    cbox.id = sarja.nimi; // TODO : muuttaa ettei valtia ctr + alt + v=?
     cbox.checked = true; // Tällöin viimeinen on aina checked.
+
+
+    label.htmlFor = cbox.id;
 
     label.appendChild(cbox);
 
@@ -151,14 +154,14 @@ let form = document.forms["lomake"];
   let jasen2 = document.getElementById("jasen2");
   console.log("Joukkueen jasen 2: ", jasen2.value);
  
-  //for ( let joukkue of joukkueTaulukko){
-/*
-  if(jnimi.value.trim().length <= 2){
+/*   for ( let joukkue of joukkueTaulukko){
+
+  if(jnimi.value.trim().length < 2){
     jnimi.setCustomValidity("Nimen oltava vähintään 2 merkkiä!");
     jnimi.reportValidity();
     
   }
-   else if(jnimi.value.trim() == joukkue.nimi){
+   else if(jnimi.value.trim() == joukkue.nimi.toLowerCase()){
     jnimi.setCustomValidity("Joukkue on jo olemassa!");
     jasen1.reportValidity();
     
@@ -172,8 +175,8 @@ let form = document.forms["lomake"];
   jnimi.setCustomValidity("");
   jnimi.reportValidity();
  
- //}
-  */
+} */
+   validoiJoukkueenNimi(jnimi);
 
   if ((jasen1.value.trim() == "") && (jasen2.value.trim() == "") ) {
     jasen1.setCustomValidity("Oltava vähintään yksi jäsen!");
@@ -191,6 +194,13 @@ let form = document.forms["lomake"];
   localStorage.setItem("TIEA2120-vt3-2022s", JSON.stringify(data)); // Tallennetaan localstorageen.
   form.reset(); 
 
+  // Etsitään radiobuttonit.
+  let boxes = document.getElementById("boxes");
+  boxes.textContent = "";  // poistetaan radiobuttonit.
+
+  lisaaRadioBox();  // Luodaan ne uudestaan => alkuperäinen tilanne.
+  
+
   console.log(data.joukkueet);
 });
 
@@ -198,16 +208,16 @@ let form = document.forms["lomake"];
 
 
 
-
-/* function validoiJoukkueenNimi(input){
+// yritetään validoia joukkueen nimi
+ function validoiJoukkueenNimi(input){
 
 for ( let joukkue of joukkueTaulukko){
-  if(input.trim().length < 2){
+  if(input.value.trim().length < 2){
     input.setCustomValidity("Nimen oltava vähintään 2 merkkiä!");
     return false;
     
   }
-  else if(input.trim() == joukkue.nimi){
+  else if(input.value.trim() == joukkue.nimi.toLowerCase()){
     input.setCustomValidity("Joukkue on jo olemassa!");
     return false;
     
@@ -220,7 +230,7 @@ for ( let joukkue of joukkueTaulukko){
 }
 
 }
- */
+ 
 
 
 /**
