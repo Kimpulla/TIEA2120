@@ -52,18 +52,19 @@ function start(data) {
  // Luodaan globaalit taulukot:
  let sarjaTaulukko = [];
  let joukkueTaulukko = [];
+ let jasenetTaulukko = [];
+ let sarjaIdJaNimi = [];
 
 
  // Kutsutaan funktioita:
- joukkueet(); 
+ joukkueetDeep(); 
  lisaaCheckBox();
  luoSarjaT();
+ luoSarjanNimiJaId();
 
-
-
- // Olemassa olevat sarjat: ESIM:
- // 4h, 2h, 8h, 6 tuntia, pitkä sarja 14 ja pitkä sarja 11
-
+ // Lisätään lista joukkueista.
+ document.getElementById("lista").appendChild(createJoukkueetList(joukkueTaulukko[0]));
+ createJoukkueetList(joukkueTaulukko.set0);       
 
 
   // tänne oma koodi
@@ -231,10 +232,15 @@ for ( let joukkue of joukkueTaulukko){
  */
 function uusiJoukkue(nimi,sarja,jasen1,jasen2){
 
+  // Nollataan jasenetTaulukko.
+  jasenetTaulukko = [];
+
+  luoJasenetT(jasen1,jasen2);
+
   let newTeam = {
     aika: "00:00:00",
-    jasenet: [jasen1,jasen2],
-    leimaustapa:["0"],
+    jasenet: jasenetTaulukko,
+    leimaustapa: ["0"],
     matka: 0,
     nimi: nimi,
     pisteet: 0,
@@ -246,6 +252,27 @@ function uusiJoukkue(nimi,sarja,jasen1,jasen2){
 
 }
 
+/**
+ * Funktio luoJasenetT täyttää jasenetTaulukon uusilla jasenilla,
+ * joka sitten myöhemmin tarvitaan uuden joukkueen lisäämisessä ( funktio uusiJoukkue ).
+ * 
+ * @param {String} jasen1 
+ * @param {String} jasen2 
+ */
+function luoJasenetT(jasen1,jasen2){
+  
+  jasenetTaulukko.push(jasen1,jasen2);
+
+  if(jasen1 == ""){
+     let index = jasenetTaulukko.indexOf(jasen1);
+     jasenetTaulukko.splice(index,1);
+  }
+  if(jasen2 == ""){
+    let index2 = jasenetTaulukko.indexOf(jasen2);
+    jasenetTaulukko.splice(index2,1);
+  }
+  
+}
 
 /**
  * Luodaan sarjaTaulukko.
@@ -283,7 +310,7 @@ function uusiJoukkue(nimi,sarja,jasen1,jasen2){
 /**
  * Funktiolla luodaan deepcopy taulukko alkuperäisestä data.joukkueet taulukosta.
  */
- function joukkueet(){
+ function joukkueetDeep(){
 
   let joukkueet = data.joukkueet;
   for (let joukkue of joukkueet) {
@@ -302,6 +329,117 @@ function uusiJoukkue(nimi,sarja,jasen1,jasen2){
   console.log("JoukkueTaulukko: ");
   console.log(joukkueTaulukko);
 }
+
+
+function luoSarjanNimiJaId(){
+
+  let sarjat = data.sarjat;
+  for( let sarja of sarjat){
+
+  let uusiSarja = {
+    id: sarja.id,
+    nimi: sarja.nimi
+  
+  };
+  sarjaIdJaNimi.push(uusiSarja);
+}
+console.log("sarja id ja nimi");
+console.log(sarjaIdJaNimi);
+}
+
+
+
+/**
+ * Funktiolla createJoukkueetList luodaan ul ja li elementit joukkueille.
+ * 
+ * @returns listan.
+ */
+ function createJoukkueetList() {
+
+  // Luodaan ul -elementti.
+  let list = document.createElement("ul");
+  
+  for(let i = 0; i < joukkueTaulukko.length;i++){
+
+    let li1 = document.createElement("li");  // Luodaan li -elementti.    
+    li1.appendChild(document.createTextNode(joukkueTaulukko[i]["nimi"]));  // Asetetaan li -elementille sisältö.
+
+    let pituus1 = sarjaIdJaNimi.length;
+    let counter1 = 0;
+    while(pituus1 != 0){
+
+      try{
+        if (sarjaIdJaNimi[counter1]["id"] == joukkueTaulukko[i]["sarja"]){
+
+          let sarjanNimi = sarjaIdJaNimi[counter1]["nimi"];
+          let strong = document.createElement("strong");  // Luodaan strong -elementti.
+
+          strong.textContent = "  " + sarjanNimi;
+          li1.appendChild(strong);
+          list.appendChild(li1);  // Asetetaan li -elementti ul- elementin lapsoseksi.
+          break;
+        }
+
+      }catch(e){
+        console.log("Sarjan id:tä ei löytynyt");
+      }
+      pituus1--;
+      counter1++;
+    }
+
+    
+
+    let ul = document.createElement("ul");  // Luodaan ul -elementti.
+    li1.appendChild(ul);  // Asetetaan ul -elementti li- elementin lapsoseksi.
+
+    let pituus = joukkueTaulukko[i]["jasenet"].length;
+    let counter = 0;
+
+    while(pituus != 0){
+
+        let li = document.createElement("li");  // Luodaan li -elementti.
+        li.appendChild(document.createTextNode(joukkueTaulukko[i]["jasenet"][counter]));  // Asetetaan li -elementille sisältö.
+        ul.appendChild(li);  // Asetetaan li -elementti ul- elementin lapsoseksi.
+        pituus--;
+        counter++;
+    
+    }
+  }
+return list;
+}
+
+
+/**
+ * Funktio päivittää rasti listan.
+ */
+ function paivitaRastit(){
+/*
+  // Etsitään elementti id:n perusteella.
+  let list = document.getElementById("rastit");
+  list.textContent = ""; // Tyhjennetään div id="rastit".
+
+  // Tyhjennetään molemmat taulukot.
+  rastitIteroitava = [];
+  rastiTaulukko = [];
+
+  // Kutsutaan rastit metodia, joka täyttää rastiTaulukko taulukon.
+  rastit();
+  // Tyhjennetään jälleen div id="rastit".
+  list.textContent = "";
+
+  // Luodaan rastiTaulukosta taulukko, jotta sitä voidaan iteroida/sortata.
+  // Hieman liian paljon välivaiheita, kun saisi paljon helpommallakin,
+  // mutta tulipahan tehtyä.
+  rastitIteroitava = rastiTaulukko.map(a => a.koodi);
+  rastitIteroitava.sort(compareRastit); 
+
+  // Täytetään div id = "rastit" uudestaan.
+  list.appendChild(createRastitList(rastiTaulukko[0]));
+  createRastitList(rastiTaulukko.set0);
+  console.log();
+  */
+}
+
 
 
 }
