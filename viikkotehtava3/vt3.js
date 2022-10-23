@@ -49,13 +49,17 @@ function alustus() {
 // oma sovelluskoodi voidaan sijoittaa tähän funktioon
 function start(data) {
 
+ // Luodaan globaalit taulukot:
+ let sarjaTaulukko = [];
+ let joukkueTaulukko = [];
+
 
  // Kutsutaan funktioita:
  joukkueet(); 
  lisaaCheckBox();
+ luoSarjaT();
 
- // Luodaan globaalit taulukot:
- //let joukkueTaulukko = [];
+
 
  // Olemassa olevat sarjat: ESIM:
  // 4h, 2h, 8h, 6 tuntia, pitkä sarja 14 ja pitkä sarja 11
@@ -145,15 +149,77 @@ let form = document.forms["lomake"];
   // Etsitään jäsen 2 -input elementin sijainti.
   let jasen2 = document.getElementById("jasen2");
   console.log("Joukkueen jasen 2: ", jasen2.value);
+ 
+  //for ( let joukkue of joukkueTaulukko){
+/*
+  if(jnimi.value.trim().length <= 2){
+    jnimi.setCustomValidity("Nimen oltava vähintään 2 merkkiä!");
+    jnimi.reportValidity();
+    
+  }
+   else if(jnimi.value.trim() == joukkue.nimi){
+    jnimi.setCustomValidity("Joukkue on jo olemassa!");
+    jasen1.reportValidity();
+    
+  } 
+  else{
+    jnimi.setCustomValidity("");
+    jnimi.reportValidity();
+    uusiJoukkue(jnimi.value,sarjanId,jasen1.value,jasen2.value);
+  }
 
-  uusiJoukkue(jnimi.value,sarjanId,jasen1.value,jasen2.value);
+  jnimi.setCustomValidity("");
+  jnimi.reportValidity();
+ 
+ //}
+  */
+
+  if ((jasen1.value.trim() == "") && (jasen2.value.trim() == "") ) {
+    jasen1.setCustomValidity("Oltava vähintään yksi jäsen!");
+    jasen1.reportValidity();
+  } else {
+    jasen1.setCustomValidity("");
+    jasen1.reportValidity();
+    uusiJoukkue(jnimi.value,sarjanId,jasen1.value,jasen2.value);
+  }
+
+  jasen1.setCustomValidity("");
+  jasen1.reportValidity();
+
   localStorage.setItem("TIEA2120-vt3-2022s", JSON.stringify(data)); // Tallennetaan localstorageen.
+  form.reset(); 
 
   console.log(data.joukkueet);
-
-  form.reset();   
-  
 });
+
+
+
+
+
+
+/* function validoiJoukkueenNimi(input){
+
+for ( let joukkue of joukkueTaulukko){
+  if(input.trim().length < 2){
+    input.setCustomValidity("Nimen oltava vähintään 2 merkkiä!");
+    return false;
+    
+  }
+  else if(input.trim() == joukkue.nimi){
+    input.setCustomValidity("Joukkue on jo olemassa!");
+    return false;
+    
+  }
+  else{
+    input.setCustomValidity("");
+    input.reportValidity();
+    return true;
+  }
+}
+
+}
+ */
+
 
 /**
  * Luodaan uusi joukkue.
@@ -177,7 +243,40 @@ function uusiJoukkue(nimi,sarja,jasen1,jasen2){
     
   };
   data.joukkueet.push(newTeam);
+
 }
+
+
+/**
+ * Luodaan sarjaTaulukko.
+ * 
+ * @param {String} alkuaika 
+ * @param {String} id
+ * @param {String} kesto 
+ * @param {String} loppuaika
+ * @param {String} nimi
+ */
+ function luoSarjaT(){
+
+  for (let sarja of data.sarjat){
+    let uusiSarja = {
+      alkuaika: sarja.alkuaika,
+      id: sarja.id,
+      kesto:sarja.kesto,
+      loppuaika: sarja.loppuaika,
+      nimi: sarja.nimi
+    
+    };
+  sarjaTaulukko.push(uusiSarja);
+  }
+  console.log("SarjaTaulukko ei sortattu: ");
+  console.log(sarjaTaulukko);
+
+  console.log("SarjaTaulukko sortattu: ");
+  sarjaTaulukko.sort(compareName);
+  console.log(sarjaTaulukko);
+}
+
 
 
 
@@ -185,8 +284,6 @@ function uusiJoukkue(nimi,sarja,jasen1,jasen2){
  * Funktiolla luodaan deepcopy taulukko alkuperäisestä data.joukkueet taulukosta.
  */
  function joukkueet(){
-
-  let joukkueTaulukko = [];
 
   let joukkueet = data.joukkueet;
   for (let joukkue of joukkueet) {
@@ -202,11 +299,31 @@ function uusiJoukkue(nimi,sarja,jasen1,jasen2){
   };
   joukkueTaulukko.push(joukkueAttr);      
   }
+  console.log("JoukkueTaulukko: ");
   console.log(joukkueTaulukko);
 }
 
 
 }
+
+/**
+ * Apumetodi, joka vertailee annettuja arvoja.
+ * @param {*} a
+ * @param {*} b
+ * @returns -1,1 tai 0
+ */
+ function compareName(a, b) {
+  if (a.nimi < b.nimi) {
+    return -1;
+  }
+  if (a.nimi > b.nimi) {
+    return 1;
+  }
+  return 0;
+}
+
+
+
 
 
 
