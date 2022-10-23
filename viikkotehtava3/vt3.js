@@ -58,7 +58,7 @@ function start(data) {
 
  // Kutsutaan funktioita:
  joukkueetDeep(); 
- lisaaCheckBox();
+ lisaaRadioBox();
  luoSarjaT();
  luoSarjanNimiJaId();
 
@@ -67,7 +67,7 @@ function start(data) {
  createJoukkueetList(joukkueTaulukko.set0);       
 
 
-  // tänne oma koodi
+
   console.log(data);
   // tallenna data sen mahdollisten muutosten jälkeen aina localStorageen. 
   // localStorage.setItem("TIEA2120-vt3-2022s", JSON.stringify(data));
@@ -80,16 +80,16 @@ function start(data) {
 
 
 /**
- * Funktiolla lisaaCheckBox luodaan checkbox -ja niiden label -elementit.
+ * Funktiolla lisaaRadioBox luodaan radiobox -ja niiden label -elementit.
  */
-function lisaaCheckBox(){
+function lisaaRadioBox(){
 
   // Etsii div elementint id:n perusteella.
   let boxit = document.getElementById("boxes");
 
   let sarjat = data.sarjat;
 
-  // Käydään datan sarjat läpi ja luodaan checkboxit + labelit.
+  // Käydään datan sarjat läpi ja luodaan radioboxit + labelit.
   for(let sarja of sarjat){
 
     // Luodaan label ja tarvittavat attribuutit.
@@ -122,7 +122,7 @@ function lisaaCheckBox(){
 let form = document.forms["lomake"];
 
 /**
- * Asetetaan lisaa napin toimivuus, mahdollistetaan rastin lisääminen
+ * Asetetaan lisaa napin toimivuus, mahdollistetaan joukkueiden lisääminen
  * tietokantaan.
  */
  form.addEventListener("submit", function (e) {
@@ -135,7 +135,7 @@ let form = document.forms["lomake"];
 
   
   let sarjanId;
-  // Etsitään valittu checkbox ja tämän sarjan id.
+  // Etsitään valittu radiobox ja tämän sarjan id.
   for (let sarja of data.sarjat){
      if(document.getElementById(sarja.nimi).checked == true){
       sarjanId = sarja.id;
@@ -187,6 +187,7 @@ let form = document.forms["lomake"];
   jasen1.setCustomValidity("");
   jasen1.reportValidity();
 
+  paivitaJoukkueet();
   localStorage.setItem("TIEA2120-vt3-2022s", JSON.stringify(data)); // Tallennetaan localstorageen.
   form.reset(); 
 
@@ -358,6 +359,15 @@ console.log(sarjaIdJaNimi);
 
   // Luodaan ul -elementti.
   let list = document.createElement("ul");
+
+  joukkueTaulukko.sort(compareJoukkue);  // Järjestetään joukkueen nimet aakkosjärjestykseen.
+
+  for(let i = 0; i < joukkueTaulukko.length;i++){  // Järjestetään jäsenet.
+    joukkueTaulukko[i]["jasenet"].sort((a, b) =>
+    a.localeCompare(b, "fi", { sensitivity: "base" })
+  );
+  }
+
   
   for(let i = 0; i < joukkueTaulukko.length;i++){
 
@@ -409,39 +419,63 @@ return list;
 }
 
 
+
 /**
  * Funktio päivittää rasti listan.
  */
- function paivitaRastit(){
-/*
+ function paivitaJoukkueet(){
+
   // Etsitään elementti id:n perusteella.
-  let list = document.getElementById("rastit");
-  list.textContent = ""; // Tyhjennetään div id="rastit".
+  let list = document.getElementById("lista");
+  list.textContent = ""; // Tyhjennetään div id="lista".
 
   // Tyhjennetään molemmat taulukot.
-  rastitIteroitava = [];
-  rastiTaulukko = [];
+  joukkueTaulukko = [];
+  sarjaIdJaNimi = [];
 
-  // Kutsutaan rastit metodia, joka täyttää rastiTaulukko taulukon.
-  rastit();
-  // Tyhjennetään jälleen div id="rastit".
+  // Kutsutaan joukkueetDeep ja luoSarjanNimiJaId metodeja, jotka täyttävät taulukot uudestaan.
+  joukkueetDeep();
+  luoSarjanNimiJaId();
+
+  // Tyhjennetään jälleen div id="lista".
   list.textContent = "";
 
-  // Luodaan rastiTaulukosta taulukko, jotta sitä voidaan iteroida/sortata.
-  // Hieman liian paljon välivaiheita, kun saisi paljon helpommallakin,
-  // mutta tulipahan tehtyä.
-  rastitIteroitava = rastiTaulukko.map(a => a.koodi);
-  rastitIteroitava.sort(compareRastit); 
+  // Järjestetään joukkueiden nimet aakkosjärjestykseen.
+  joukkueTaulukko.sort(compareJoukkue);
 
-  // Täytetään div id = "rastit" uudestaan.
-  list.appendChild(createRastitList(rastiTaulukko[0]));
-  createRastitList(rastiTaulukko.set0);
+  // Järjestetään jäsenet.
+  for(let i = 0; i < joukkueTaulukko.length;i++){
+    joukkueTaulukko[i]["jasenet"].sort((a, b) =>
+    a.localeCompare(b, "fi", { sensitivity: "base" })
+  );
+  }
+  // Täytetään div id = "lista" uudestaan.
+  list.appendChild(createJoukkueetList(joukkueTaulukko[0]));
+  createJoukkueetList(joukkueTaulukko.set0);
   console.log();
-  */
 }
 
 
 
+}
+
+/** 
+ * Apufunktio, joka vertailee joukkeuiden nimiä.
+ *
+ * @param {*} joukkue1
+ * @param {*} joukkue2
+ * @returns -1, 0 tai 1
+ */
+
+ function compareJoukkue(joukkue1, joukkue2) {
+
+  if (joukkue1.nimi.toLowerCase() < joukkue2.nimi.toLowerCase()) {
+          return -1;
+  }
+  if (joukkue1.nimi.toLowerCase() > joukkue2.nimi.toLowerCase()) {
+          return 1;
+  }
+  return 0;
 }
 
 /**
@@ -459,11 +493,5 @@ return list;
   }
   return 0;
 }
-
-
-
-
-
-
 
 window.addEventListener("load", alustus);
