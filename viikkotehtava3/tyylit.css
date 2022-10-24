@@ -23,8 +23,14 @@ fieldset{
    text-align: right;
    line-height: 0.5em;
  }
+ input[type=radio] {
+  float: right;
+}
+
  input[type=checkbox] {
-   vertical-align: right;
    float:right;
  }
- /*Merlkein on cehckboxit ok, labelit vähän alemmas*/
+
+ input[type="text"] {
+  float:right;
+}
