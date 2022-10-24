@@ -168,6 +168,8 @@ let form = document.forms["lomake"];
  * tietokantaan.
  */
  form.addEventListener("submit", function (e) {
+
+  addNew();
                
   e.preventDefault(); // estetään lomakkeen lähettäminen
 
@@ -289,54 +291,52 @@ let form = document.forms["lomake"];
 
 
 
-    // dynaaminen lista koko sivun input-elementeistä
+ 
+   // dynaaminen lista koko sivun input-elementeistä
     // voisi käyttää myös omaa taulukkoa tms.
-    let inputit = document.getElementsByClassName("attr");
-    inputit[0].addEventListener("input", addNew); //ok
+    let inputit = document.getElementsByClassName("attr"); // live nodelist kaikista input-elementeistä
+    inputit[0].addEventListener("input", addNew); //tulee input --> uusi input
 
     function addNew(e) {
+        let tyhja = false;  // oletuksena ei ole löydetty tyhjää
+
         // käydään läpi kaikki input-kentät viimeisestä ensimmäiseen
         // järjestys on oltava tämä, koska kenttiä mahdollisesti poistetaan
         // ja poistaminen sotkee dynaamisen nodeList-objektin indeksoinnin
         // ellei poisteta lopusta 
-        let viimeinen_tyhja = -1; // viimeisen tyhjän kentän paikka listassa
-        for(let i=inputit.length-1 ; i>-1; i--) { // inputit näkyy ulommasta funktiosta
+        for(let i = inputit.length-1 ; i>-1; i--) { // inputit näkyvät ulommasta funktiosta
             let input = inputit[i];
-            // jos on jo löydetty tyhjä kenttä ja löydetään uusi niin poistetaan viimeinen tyhjä kenttä
-            // kenttä on aina label-elementin sisällä eli oikeasti poistetaan label ja samalla sen sisältö
-            // <form id="lomake" action="ei toimi">
-            //<label>Kenttä <input type="text" value="" /></label>
-            //<label>Kenttä <input type="text" value="" /></label>
-            //<label>Kenttä <input type="text" value="" /></label>
-            //<label>Kenttä <input type="text" value="" /></label>
-            // </form>
-            if ( viimeinen_tyhja > -1 && input.value.trim() == "") { // ei kelpuuteta pelkkiä välilyöntejä
-                let poistettava = inputit[viimeinen_tyhja].parentNode; // parentNode on label, joka sisältää inputin
-                document.forms[0].removeChild( poistettava );
-                viimeinen_tyhja = i;
+
+            // jos on tyhjä ja on jo aiemmin löydetty tyhjä niin poistetaan
+            if ( input.value.trim() == "" && tyhja) { // ei kelpuuteta pelkkiä välilyöntejä
+                inputit[i].parentNode.remove(); // parentNode on label, joka sisältää inputin
             }
-            // ei ole vielä löydetty yhtään tyhjää joten otetaan ensimmäinen tyhjä talteen
-            if ( viimeinen_tyhja == -1 && input.value.trim() == "") {
-                    viimeinen_tyhja = i;
+
+	    // onko tyhjä?
+            if ( input.value.trim() == "") {
+                    tyhja = true;
             }
         }
-        // ei ollut tyhjiä kenttiä joten lisätään yksi
-        if ( viimeinen_tyhja == -1) {
+
+        // jos ei ollut tyhjiä kenttiä joten lisätään yksi
+        if ( !tyhja) {
             let label = document.createElement("label");
-            label.textContent = "Kenttä";
+            label.textContent = "Jäsen";
             let input = document.createElement("input");
             input.setAttribute("type", "text");
             input.addEventListener("input", addNew)
             document.forms[0].appendChild(label).appendChild(input);
         }
-        // jos halutaan kenttiin numerointi
+
+
+        // tehdään kenttiin numerointi
         for(let i=0; i<inputit.length; i++) { // inputit näkyy ulommasta funktiosta
                 let label = inputit[i].parentNode;
-                label.firstChild.nodeValue = "Kenttä " + (i+1); // päivitetään labelin ekan lapsen eli tekstin sisältö
+                label.firstChild.nodeValue = "Jäsen " + (i+1); // päivitetään labelin ekan lapsen eli tekstin sisältö
         }
     
+    
     }
-
 
 
 
