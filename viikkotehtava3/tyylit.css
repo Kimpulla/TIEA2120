@@ -17,3 +17,14 @@ fieldset{
    float:right;
    display:block;
  }
+
+ #lomake .oikea2{
+   display:block;
+   text-align: right;
+   line-height: 0.5em;
+ }
+ input[type=checkbox] {
+   vertical-align: right;
+   float:right;
+ }
+ /*Merlkein on cehckboxit ok, labelit vähän alemmas*/
