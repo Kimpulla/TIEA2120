@@ -54,7 +54,7 @@ function start(data) {
  let joukkueTaulukko = [];
  let jasenetTaulukko = [];
  let sarjaIdJaNimi = [];
- let leimaustavat = [];
+ let leimaustavatT = [];
 
 
  // Kutsutaan funktioita:
@@ -169,7 +169,7 @@ let form = document.forms["lomake"];
  */
  form.addEventListener("submit", function (e) {
 
-  addNew();
+  
                
   e.preventDefault(); // estetään lomakkeen lähettäminen
 
@@ -188,8 +188,20 @@ let form = document.forms["lomake"];
   console.log("Joukkueen sarjan id: ", sarjanId);
 
   // Etsitään jäsen 1 -input elementin sijainti.
-  let jasen1 = document.getElementById("jasen1");
-  console.log("Joukkueen jasen 1: ", jasen1.value);
+  let jasenet = document.getElementsByClassName("jasenet");
+  console.log("Joukkueen jasen 1: ", jasenet.value);
+
+  // Nollataan.
+  jasenetTaulukko = [];
+// array fromilla
+  for(let i = 0; i < jasenet.length;i++){
+    jasenetTaulukko.push(jasenet[i].value);
+    console.log(jasenetTaulukko);
+  }
+
+  luoJasenetT();
+
+
  
   // Etsitään jäsen 2 -input elementin sijainti.
   //let jasen2 = document.getElementById("jasen2");
@@ -200,13 +212,20 @@ let form = document.forms["lomake"];
   console.log("checkboxit: ", cbox.value);
 
   // Näiden avulla lisätään tai ei lisätä joukkuetta. Käytännössä true, false.
-  let judgement;
+  let leimausJudgement;
+  let jasenJudgement;
   let nimiJudgement;
   let pituusJudgement;
 
+     if(jasenet.value != ""){
+    addNew();
+  }   
+
+  //addNew();
+
   /* Tästä alkaa validoinnit */
 
-    // Joukkueen nimen validointi.
+  // Joukkueen nimen validointi.
   if(jnimi.value.trim().length < 2){
     jnimi.setCustomValidity("Nimen oltava vähintään 2 merkkiä!");
     jnimi.reportValidity();
@@ -222,50 +241,52 @@ let form = document.forms["lomake"];
 
    for ( let joukkue of joukkueTaulukko){
 
-    if(jnimi.value.trim() == joukkue.nimi.toLowerCase()){
+    if(jnimi.value.trim().localeCompare(joukkue.nimi.trim(), 'fi', { sensitivity: 'base' }) == 0){
       jnimi.setCustomValidity("Joukkue on jo olemassa!");
-      jasen1.reportValidity();
+      jnimi.reportValidity();
       pituusJudgement = -1;
+      break;
     } 
     else{
       jnimi.setCustomValidity("");
       jnimi.reportValidity();
       pituusJudgement = 1;
     }
+  } 
       jnimi.setCustomValidity("");
       jnimi.reportValidity();
-  } 
 
   // Jasenien validointi.
-  if ((jasen1.value.trim() == "") /*&& (jasen2.value.trim() == "") */) {
-    jasen1.setCustomValidity("Oltava vähintään kaksi jäsentä!");
-    jasen1.reportValidity();
-    judgement = -1;
-  } else {
-    jasen1.setCustomValidity("");
-    jasen1.reportValidity();
-    judgement = 1;
-  }
-    jasen1.setCustomValidity("");
-    jasen1.reportValidity(); 
+    if ((jasenetTaulukko.length < 2)) {
+      jasenet[0].setCustomValidity("Oltava vähintään kaksi jäsentä!");
+      jasenet[0].reportValidity();
+      jasenJudgement = -1;
+    } else {
+      jasenet[0].setCustomValidity("");
+      jasenet[0].reportValidity();
+      jasenJudgement = 1;
+    }
+      jasenet[0].setCustomValidity("");
+      jasenet[0].reportValidity(); 
+
 
   // Leimaustavan validointi.
   if(getLeimaustapa(cbox).length == 0){
     document.getElementById("NFC").setCustomValidity("Leimaustapaa ei ole valittu");
     document.getElementById("NFC").reportValidity();
-    judgement = -1;
+    leimausJudgement = -1;
   }else {
     document.getElementById("NFC").setCustomValidity("");
     document.getElementById("NFC").reportValidity();
-    judgement = 1;
+    leimausJudgement = 1;
   }
     document.getElementById("NFC").setCustomValidity("");
     document.getElementById("NFC").reportValidity();
   
 
   // Jos judgementit sen sallii, luodaan uusi joukkue.  
-  if (judgement == 1 && nimiJudgement == 1 && pituusJudgement == 1){
-    uusiJoukkue(jnimi.value,sarjanId,jasen1.value,jasen2.value,getLeimaustapa(cbox));
+  if (jasenJudgement == 1 && nimiJudgement == 1 && pituusJudgement == 1 && leimausJudgement == 1){
+    uusiJoukkue(jnimi.value,sarjanId,getLeimaustapa(cbox)); //poistettu jasen1.value,jasen2.value
   }
  
 
@@ -278,24 +299,29 @@ let form = document.forms["lomake"];
   boxes.textContent = "";  // poistetaan radiobuttonit.
 
   lisaaRadioBox();  // Luodaan ne uudestaan => alkuperäinen tilanne.
-  
+
+  let tyhja = false; 
+
+  for(let i = inputit.length-1 ; i >= 1; i--) { // inputit näkyvät ulommasta funktiosta
+    let input = inputit[i];
+    if ( input.value.trim() == "") {
+      tyhja = true;
+  }
+
+      if ( input.value.trim() == "" && tyhja) { // ei kelpuuteta pelkkiä välilyöntejä
+        inputit[i].parentNode.parentNode.remove(); // parentNode on label, joka sisältää inputin
+      }
+  }
 
   console.log(data.joukkueet);
 });
 
 
-
-
-
-
-
-
-
- 
    // dynaaminen lista koko sivun input-elementeistä
     // voisi käyttää myös omaa taulukkoa tms.
-    let inputit = document.getElementsByClassName("attr"); // live nodelist kaikista input-elementeistä
+    let inputit = document.getElementsByClassName("jasenet"); // live nodelist kaikista input-elementeistä
     inputit[0].addEventListener("input", addNew); //tulee input --> uusi input
+    let inputinID = document.getElementById("jasenetField");
 
     function addNew(e) {
         let tyhja = false;  // oletuksena ei ole löydetty tyhjää
@@ -320,12 +346,19 @@ let form = document.forms["lomake"];
 
         // jos ei ollut tyhjiä kenttiä joten lisätään yksi
         if ( !tyhja) {
+            let pp = document.createElement("p");
             let label = document.createElement("label");
             label.textContent = "Jäsen";
+            label.className = "vasen";
             let input = document.createElement("input");
-            input.setAttribute("type", "text");
-            input.addEventListener("input", addNew)
-            document.forms[0].appendChild(label).appendChild(input);
+           // input.id = "jasen" + inputit;
+            input.setAttribute("class", "jasenet");
+            input.addEventListener("input", addNew);
+            pp.appendChild(label).appendChild(input);
+            inputinID.appendChild(pp);
+
+            let vali = document.createElement("br");
+            pp.appendChild(vali);
         }
 
 
@@ -338,8 +371,7 @@ let form = document.forms["lomake"];
     
     }
 
-
-
+ 
 
 
 
@@ -353,40 +385,26 @@ let form = document.forms["lomake"];
 function getLeimaustapa(array){
 
   // Nollataan taulukko.
-  leimaustavat = [];
+  leimaustavatT = [];
 
  for(let i = 0; i < array.length;i++){
   if(array[i].checked == true){
-    leimaustavat.push(i.toString());
+    leimaustavatT.push(i.toString());
   }
 }
-return leimaustavat;
-}
-
-// yritetään validoia joukkueen nimi
- function validoiJoukkueenNimi(input){
-
-for ( let joukkue of joukkueTaulukko){
-  if(input.value.trim().length < 2){
-    input.setCustomValidity("Nimen oltava vähintään 2 merkkiä!");
-    return false;
-    
-  }
-  else if(input.value.trim() == joukkue.nimi.toLowerCase()){
-    input.setCustomValidity("Joukkue on jo olemassa!");
-    return false;
-    
-  }
-  else{
-    input.setCustomValidity("");
-    input.reportValidity();
-    return true;
-  }
+return leimaustavatT;
 }
 
-}
  
+function naytaLeimaustavat(){
 
+  let leimat = data.leimaustavat;
+
+/*   for (let i = 0; i < joukkueTaulukko.length; i++){
+    if ( joukkueTaulukko[i]["leimaustavat"][i] == //jotain)
+  }
+ */
+}
 
 /**
  * Luodaan uusi joukkue.
@@ -396,12 +414,12 @@ for ( let joukkue of joukkueTaulukko){
  * @param {*} jasen1 
  * @param {*} jasen2 
  */
-function uusiJoukkue(nimi,sarja,jasen1,jasen2,cbox){
+function uusiJoukkue(nimi,sarja,cbox){ //poistettu jasen1,jasen2
 
   // Nollataan jasenetTaulukko.
-  jasenetTaulukko = [];
+ // jasenetTaulukko = [];
 
-  luoJasenetT(jasen1,jasen2);
+  //luoJasenetT(); //poistettu jasen1,jasen2
 
   let newTeam = {
     aika: "00:00:00",
@@ -422,22 +440,17 @@ function uusiJoukkue(nimi,sarja,jasen1,jasen2,cbox){
  * Funktio luoJasenetT täyttää jasenetTaulukon uusilla jasenilla,
  * joka sitten myöhemmin tarvitaan uuden joukkueen lisäämisessä ( funktio uusiJoukkue ).
  * 
- * @param {String} jasen1 
+ * @param {String} jasen1 ///eipä ollukkaa
  * @param {String} jasen2 
  */
-function luoJasenetT(jasen1,jasen2){
-  
-  jasenetTaulukko.push(jasen1,jasen2);
+function luoJasenetT(){
 
-  if(jasen1 == ""){
-     let index = jasenetTaulukko.indexOf(jasen1);
+for ( let jasen of jasenetTaulukko){
+   if(jasen == ""){
+     let index = jasenetTaulukko.indexOf(jasen); 
      jasenetTaulukko.splice(index,1);
   }
-  if(jasen2 == ""){
-    let index2 = jasenetTaulukko.indexOf(jasen2);
-    jasenetTaulukko.splice(index2,1);
-  }
-  
+}
 }
 
 /**
@@ -660,3 +673,7 @@ return list;
 }
 
 window.addEventListener("load", alustus);
+
+
+
+/// TODO: Leimaustavat aakkosjärjestys
