@@ -104,10 +104,10 @@ function lisaaRadioBox(){
     let cbox = document.createElement("input");
     cbox.type = "radio";
     cbox.name = "rg";
-    cbox.id = sarja.nimi;
+    cbox.value = sarja.nimi;
     cbox.checked = true; // Tällöin viimeinen on aina checked.
 
-    label.htmlFor = cbox.id;
+   
     label.appendChild(cbox);
 
     // Luodaan väli.
