@@ -402,9 +402,9 @@ function uusiJoukkue(nimi,sarja,cbox){
     aika: "00:00:00",
     jasenet: jasenetTaulukko,
     leimaustapa: cbox,
-    matka: 0,
+    matka: "0",
     nimi: nimi,
-    pisteet: 0,
+    pisteet: "0",
     rastileimaukset: [],
     sarja: sarja,
   };
@@ -570,7 +570,7 @@ function luoLeimaustavatSorted(){
     // Asetetaan joukkueen leimaustavat sarjan perään listassa.
     let pituus2 = joukkueTaulukko[i]["leimaustapa"].length;
     let leimaArray = [];
-
+    let str;
      try{
     
         for (let j = 0; j < pituus2; j++){
@@ -579,7 +579,7 @@ function luoLeimaustavatSorted(){
           leima = "";
         }
         // Luodaan taulukosta string
-        let str = leimaArray.toString();
+        str = leimaArray.toString();
         leimaArray = [];
         let span = document.createElement("span");  // Luodaan span -elementti.
         span.textContent = "  " + "(" + str + ")";
@@ -605,6 +605,17 @@ function luoLeimaustavatSorted(){
         counter++;
     
     }
+    let a = document.createElement("a");
+    a.textContent = joukkueTaulukko[i]["nimi"] + " " + sarjaIdJaNimi[counter1]["nimi"] + "  " + "(" + str + ")";
+    a.setAttribute("href","#lomake");
+    li1.appendChild(a);
+
+    a.addEventListener("click", function(e) {
+        let joukkue = joukkueTaulukko[i];
+        palautaTiedot();
+      });
+   
+    
   }
 return list;
 }
@@ -643,6 +654,47 @@ return list;
   createJoukkueetList(joukkueTaulukko.set0);
   console.log();
 }
+
+/**
+ * Palautettaisiin joukkueen tiedot lomakkeelle.
+ * Vahvasti kesken.
+ */
+ function palautaTiedot(){
+
+	let lomake = document.forms.lomake;
+	lomake.reset();
+  
+	addNew();
+
+	document.forms.lomake[1].value = "Joukkueen nimi";// oisko näin
+	let sarjat = lomake.children[0].children[10].querySelectorAll("input");
+
+  // Jos id:t samat asetetaan sen sarjan radiobutton = true;
+	for(let i=0; i < sarjat.length; i++){
+		if (joukkueTaulukko[i].sarja == sarjaIdJaNimi[i].id){
+			sarjat[i].checked = true;
+		}
+	}
+  // jasenete.
+  let jasenet;
+  for (let joukkue of joukkueTaulukko){
+  jasenet = joukkue.jasenet;
+  }
+	for(let i=0; i < jasenet.length; i++){
+		lomake.children[1].children[1].children[0].children[0].value = jasenet[i];
+		addNew();
+	}
+
+	let leimaustavat = leimaustavatSorted;
+	let lomakeLeimaustavat = lomake.children[0].children[7].querySelectorAll("input");
+	for(let i = 0; i < leimaustavat.length; i++){
+		for (let j = 0; j <lomakeLeimaustavat.length; j++){
+			if (leimaustavat[i].leimaustapa == lomakeLeimaustavat[j].value){
+				lomakeLeimaustavat[j].checked = true;
+			}
+		}
+	} 
+} 
 }
 
 /** 
