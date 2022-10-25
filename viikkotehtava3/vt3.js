@@ -182,7 +182,7 @@ let form = document.forms["lomake"];
   jasenetTaulukko = [];
  
   for(let i = 0; i < jasenet.length;i++){  // Voitaisiin toteuttaa myös Array.fromilla.
-    jasenetTaulukko.push(jasenet[i].value);
+    jasenetTaulukko.push(jasenet[i].value.trim());
     console.log(jasenetTaulukko);
   }
 
@@ -197,6 +197,7 @@ let form = document.forms["lomake"];
   // Näiden avulla lisätään tai ei lisätä joukkuetta. Käytännössä true, false.
   let leimausJudgement;
   let jasenJudgement;
+  let duplicateJudgement;
   let nimiJudgement;
   let pituusJudgement;
 
@@ -240,17 +241,38 @@ let form = document.forms["lomake"];
       jnimi.reportValidity();
 
   // Jasenien validointi.
-    if ((jasenetTaulukko.length < 2)) {
-      jasenet[0].setCustomValidity("Oltava vähintään kaksi jäsentä!");
+  if ((jasenetTaulukko.length < 2)) {
+    jasenet[0].setCustomValidity("Oltava vähintään kaksi jäsentä!");
+    jasenet[0].reportValidity();
+    jasenJudgement = -1;
+  } else {
+    jasenet[0].setCustomValidity("");
+    jasenet[0].reportValidity();
+    jasenJudgement = 1;
+  }
+    jasenet[0].setCustomValidity("");
+    jasenet[0].reportValidity(); 
+
+    for (let i = 0; i < jasenetTaulukko.length;i++){
+
+    if(hasDuplicates(jasenetTaulukko) == true){
+      jasenet[0].setCustomValidity("Ei voi olla 2 saman nimistä jäsentä!");
       jasenet[0].reportValidity();
-      jasenJudgement = -1;
-    } else {
+      duplicateJudgement = -1;
+      break;
+    } 
+    else{
       jasenet[0].setCustomValidity("");
       jasenet[0].reportValidity();
-      jasenJudgement = 1;
+      duplicateJudgement = 1;
     }
-      jasenet[0].setCustomValidity("");
-      jasenet[0].reportValidity(); 
+    }
+    jasenet[0].setCustomValidity("");
+    jasenet[0].reportValidity();
+  
+
+
+
 
   // Leimaustavan validointi.
   if(getLeimaustapa(cbox).length == 0){
@@ -266,7 +288,7 @@ let form = document.forms["lomake"];
     document.getElementById("NFC").reportValidity();
   
   // Jos judgementit sen sallii, luodaan uusi joukkue.  
-  if (jasenJudgement == 1 && nimiJudgement == 1 && pituusJudgement == 1 && leimausJudgement == 1){
+  if (jasenJudgement == 1 && nimiJudgement == 1 && pituusJudgement == 1 && leimausJudgement == 1 && duplicateJudgement == 1){
     uusiJoukkue(jnimi.value,sarjanId,getLeimaustapa(cbox)); //poistettu jasen1.value,jasen2.value
   }
  
@@ -331,6 +353,7 @@ let form = document.forms["lomake"];
             let input = document.createElement("input");
            // input.id = "jasen" + inputit;
             input.setAttribute("class", "jasenet");
+            input.type="text";
             input.addEventListener("input", addNew);
             pp.appendChild(label).appendChild(input);
             inputinID.appendChild(pp);
@@ -656,4 +679,13 @@ return list;
   return 0;
 }
 
+/**
+ * Apumetodi, joka tarkastaa onka taulukossa duplikaatteja.
+ *
+ * @param {Array} array
+ * @returns false, jos duplikaatteja ei ole.
+ */
+ function hasDuplicates(array) {
+  return new Set(array).size !== array.length;
+}
 window.addEventListener("load", alustus);
