@@ -105,6 +105,7 @@ function lisaaRadioBox(){
     cbox.type = "radio";
     cbox.name = "rg";
     cbox.value = sarja.nimi;
+    cbox.id = sarja.id;
     cbox.checked = true; // Tällöin viimeinen on aina checked.
 
    
@@ -168,7 +169,7 @@ let form = document.forms["lomake"];
   let sarjanId;
   // Etsitään valittu radiobox ja tämän sarjan id.
   for (let sarja of data.sarjat){
-     if(document.getElementById(sarja.nimi).checked == true){
+     if(document.getElementById(sarja.id).checked == true){
       sarjanId = sarja.id;
      }
   }
