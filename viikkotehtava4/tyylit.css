@@ -37,7 +37,6 @@ html{
     animation-iteration-count: infinite;
  }
 
-
  @keyframes balks {
     from {
         transform: translate(0%,-100%);
@@ -46,4 +45,45 @@ html{
     to {
         transform: translate(0%,150%);
     }
+}
+
+
+/* Pingviinien animaatio tästä alaspäin */
+
+#button{
+    position:absolute;
+    z-index: 100;
+}
+
+.penquins{
+   
+    animation-duration: 10s;
+    animation-direction: alternate;
+    animation-name:penquinsMove;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.penquinsBase{
+    position:absolute;
+    
+}
+ 
+@keyframes penquinsMove{
+
+    /* x=0 ja y=0*/
+    from {transform: translate(0vw,0vh);}25%
+
+    /* Alas */
+    {transform: translateY(calc(100% - 150px));}50%
+
+    /* Oikealle */
+    {transform: translate(calc(100vw - 150px),calc(100vh - 150px));} 75%
+
+    /* Ylös */
+    {transform: translate(calc(100vw - 150px));}
+
+    /* x=0 ja y=0*/
+    to {transform: translate(0vw,0vh);}
+   
 }

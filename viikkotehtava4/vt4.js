@@ -40,9 +40,66 @@ function functionality(e){
       // Kuuntelija palkeille.
       balk.addEventListener("animationiteration",functionality);
     }
- };   
+
+    button();   
+
+};
 
 
+
+
+ 
+/**
+ * Funktio luo uuden pingviinin napin klikkauksen yhteydessä.
+ */
+function button(){
+
+/* Luodaan button -elementti */
+let button = document.createElement('button');
+
+/* Lisätään buttonille attribuutit */
+button.textContent = "lisaa pingviini";
+button.setAttribute('id','button');
+
+
+document.body.appendChild(button);
+button.addEventListener('click', createPenquin);
+}
+
+/**
+ * Funktiolla createPenquin luodaan pingviini.
+ */
+function createPenquin(){
+
+    /* Luodaan svg-elementti */
+    let base = document.createElementNS("http://www.w3.org/2000/svg",'svg');
+
+    /* Asetetaan base -elementille attribuutit */
+    base.setAttribute('width','150px');
+    base.setAttribute('height','150px');
+    base.setAttribute('width','100%');
+    base.setAttribute('height','100%');
+    base.setAttribute('xmlns','http://www.w3.org/2000/svg');
+    base.setAttribute('class','penquinsBase');
+
+    /* Luodaan image -elementti */ 
+    let penquin = document.createElementNS("http://www.w3.org/2000/svg",'image');
+    
+    /* Lisätään kuvalle attribuutit */
+    penquin.setAttribute('href','https://appro.mit.jyu.fi/tiea2120/vt/vt4/penguin.png');
+    penquin.setAttribute('class','penquins');
+    penquin.setAttribute('height','150px');
+    penquin.setAttribute('width','150px');
+    base.appendChild(penquin);
+    
+    /* Liitetään elementti html:ään */
+    document.body.appendChild(base);
+    
+}
+
+/**
+ * Funktiolla createBalk luodaan palkki.
+ */
 function createBalk(){
 
     /* Luodaan svg-elementti */
@@ -53,9 +110,6 @@ function createBalk(){
     base.setAttribute('height','100%');
     base.setAttribute('xmlns','http://www.w3.org/2000/svg');
     base.setAttribute('class','balks');
-
-    /* Liitetään elementti html:ään */
-    document.body.appendChild(base);
 
     /* luodaan defs -ja lineaari gradientti elementit */
     let defs = document.createElementNS("http://www.w3.org/2000/svg",'defs');
@@ -87,7 +141,9 @@ function createBalk(){
     rect.setAttribute('width','100%');
     rect.setAttribute('height','5em');
     rect.setAttribute('fill','url(#gradient)');
-   // rect.setAttribute('class','colorGradients');
+
+    /* Liitetään elementti html:ään */
+    document.body.appendChild(base);
 
     /* lisätään rect -elementti basen lapsoseksi */
     base.appendChild(rect);    
@@ -102,4 +158,9 @@ function createBalk(){
     gradient.appendChild(stopFirst);
     gradient.appendChild(stopSecond);
     gradient.appendChild(stopThird); 
+
+
+
+
+
 }
