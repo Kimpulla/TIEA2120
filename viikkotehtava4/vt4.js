@@ -24,7 +24,7 @@ function functionality(e){
 }
 
 /* Luodaan n määrä palkkeja */
-  for (let i = 0; i < 1; i++){
+  for (let i = 0; i < 10; i++){
       
       createBalk();
 
@@ -33,7 +33,7 @@ function functionality(e){
       let balk = balks[i];
 
       // Delayn säätöä palkkien välillä.
-      delay = delay + 0.13;
+      delay = delay + 0.10;
       let str = "" + delay + "s";
       balk.style.animationDelay = str;
 
@@ -47,8 +47,6 @@ function functionality(e){
 
 
 
-
- 
 /**
  * Funktio luo uuden pingviinin napin klikkauksen yhteydessä.
  */
@@ -65,6 +63,36 @@ button.setAttribute('id','button');
 document.body.appendChild(button);
 button.addEventListener('click', createPenquin);
 }
+
+/* Luodaan pöllö */
+let owl = document.createElement('img');
+owl.src = "http://appro.mit.jyu.fi/tiea2120/vt/vt4/owl.png";
+ 
+owl.addEventListener("load", function(){
+
+    let canvas = document.createElement('canvas');
+
+    /* Attribuutit canvakselle */
+    canvas.setAttribute('class', 'firstCanvas');
+    canvas.setAttribute('height','34.5px'); // Yhden pykälän korkeus --> 552/16
+    canvas.setAttribute('width', '564px');
+
+    //style
+
+    document.body.appendChild(canvas);
+
+    /* Haetaan canvaksen konteksti, '2d' mahdollistaa 2 ulottisen piirron */
+    let drawing = canvas.getContext('2d');
+    drawing.drawImage(owl, 0, 50, 564, 34.5, 0, 0, 564, 34.5);
+
+
+
+
+
+
+});
+
+
 
 /**
  * Funktiolla createPenquin luodaan pingviini.
