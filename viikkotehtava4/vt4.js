@@ -24,28 +24,27 @@ function functionality(e){
 }
 
 /* Luodaan n määrä palkkeja */
-  for (let i = 0; i < 10; i++){
-      
-      createBalk();
+    for (let i = 0; i < 10; i++){
 
-      // Etsitään palkit luokan perusteella
-      let balks = document.getElementsByClassName("balks");
-      let balk = balks[i];
+        let pcs = i; /* Luodaan uniikki pääte palkin id:lle. Esim gradient1, gradient2.. */
+        
+        createBalk('' + pcs);
 
-      // Delayn säätöä palkkien välillä.
-      delay = delay + 0.10;
-      let str = "" + delay + "s";
-      balk.style.animationDelay = str;
+        /* Etsitään palkit luokan perusteella*/
+        let balks = document.getElementsByClassName("balks");
+        let balk = balks[i];
 
-      // Kuuntelija palkeille.
-      balk.addEventListener("animationiteration",functionality);
+        /* Delayn säätöä palkkien välillä. */
+        delay = delay + 0.19;
+        balk.style.animationDelay = delay + "s";
+
+        /* Tapahtuman kuuntelija palkille */
+        balk.addEventListener("animationiteration",functionality);
     }
-
+    /* Kutsutaan funktioita */
+    drawOwl();
     button();   
-
 };
-
-
 
 /**
  * Funktio luo uuden pingviinin napin klikkauksen yhteydessä.
@@ -64,34 +63,83 @@ document.body.appendChild(button);
 button.addEventListener('click', createPenquin);
 }
 
-/* Luodaan pöllö */
-let owl = document.createElement('img');
-owl.src = "http://appro.mit.jyu.fi/tiea2120/vt/vt4/owl.png";
- 
-owl.addEventListener("load", function(){
+/**
+ *  Funktiolla "piirretään" pöllö ruutuun. 
+ */
+function drawOwl(){
+
+    let variable = 0;
+    
+    /* Määritellään pöllö */
+    let owl = document.createElement('img');
+    owl.src = "http://appro.mit.jyu.fi/tiea2120/vt/vt4/owl.png";
+    
+
+    owl.addEventListener("load", function() {
+       
+        for (let i = 0; i < 16; i++){
+
+            createCanvas(variable,owl);
+            variable = variable + 34.5; /* --> Kasvatetaan variablen arvoa --> seuraava pala 34.5px verran eri kohdasta. */
+            createCanvas2(variable,owl);
+            variable = variable + 34.5;
+        }
+    });
+
+}
+
+/**
+ * 
+ *  Funktio luo canvaksen, johon lisätään pöllö.
+ * 
+ * @param {Number} variable - muuttuja, joilla säädetään palojen välejä
+ * @param {*} owl 
+ */
+ function createCanvas(variable,owl){
 
     let canvas = document.createElement('canvas');
 
     /* Attribuutit canvakselle */
     canvas.setAttribute('class', 'firstCanvas');
-    canvas.setAttribute('height','34.5px'); // Yhden pykälän korkeus --> 552/16
-    canvas.setAttribute('width', '564px');
+    canvas.setAttribute('height','35'); // Yhden pykälän korkeus --> 552/16
+    canvas.setAttribute('width', '564');
 
-    //style
-
-    document.body.appendChild(canvas);
-
+    canvas.style.top = "calc(50vh + " + variable + "px" + ")";
+    canvas.style.top = "calc(21vh + " + variable + "px" + ")";
+    
     /* Haetaan canvaksen konteksti, '2d' mahdollistaa 2 ulottisen piirron */
     let drawing = canvas.getContext('2d');
-    drawing.drawImage(owl, 0, 50, 564, 34.5, 0, 0, 564, 34.5);
+    drawing.drawImage( owl, 0, variable, 564, 35, 0, 0, 564, 35);
+
+    document.body.appendChild(canvas);
+}
 
 
+/**
+ * 
+ *  Funktio luo canvaksen, johon lisätään pöllö.
+ * 
+ * @param {Number} variable - muuttuja, joilla säädetään palojen välejä
+ * @param {*} owl 
+ */
+ function createCanvas2(variable,owl){
 
+    let canvas2 = document.createElement('canvas');
 
+    /* Attribuutit canvakselle */
+    canvas2.setAttribute('class', 'secondCanvas');
+    canvas2.setAttribute('height','35'); // Yhden pykälän korkeus --> 552/16
+    canvas2.setAttribute('width', '564');
 
+    canvas2.style.top = "calc(50vh + " + variable + "px" + ")";
+    canvas2.style.top = "calc(21vh + " + variable + "px" + ")";
 
-});
+    /* Haetaan canvaksen konteksti, '2d' mahdollistaa 2 ulottisen piirron */
+    let drawing = canvas2.getContext('2d');
+    drawing.drawImage( owl, 0, variable, 564, 35, 0, 0, 564, 35);
 
+    document.body.appendChild(canvas2);
+}
 
 
 /**
@@ -102,7 +150,7 @@ function createPenquin(){
     /* Luodaan svg-elementti */
     let base = document.createElementNS("http://www.w3.org/2000/svg",'svg');
 
-    /* Asetetaan base -elementille attribuutit */
+    /* Asetetaan svg -elementille attribuutit */
     base.setAttribute('width','150px');
     base.setAttribute('height','150px');
     base.setAttribute('width','100%');
@@ -128,7 +176,7 @@ function createPenquin(){
 /**
  * Funktiolla createBalk luodaan palkki.
  */
-function createBalk(){
+function createBalk(pcs){
 
     /* Luodaan svg-elementti */
     let base = document.createElementNS("http://www.w3.org/2000/svg",'svg');
@@ -144,7 +192,7 @@ function createBalk(){
     let gradient = document.createElementNS("http://www.w3.org/2000/svg",'linearGradient');
 
     /* Asetetaan attribuutit */
-    gradient.setAttribute('id','gradient');
+    gradient.setAttribute('id','gradient' + pcs);
     gradient.setAttribute('x1','0%');
     gradient.setAttribute('y1','0%');
     gradient.setAttribute('x2','0%');
@@ -168,9 +216,9 @@ function createBalk(){
     let rect = document.createElementNS("http://www.w3.org/2000/svg",'rect');
     rect.setAttribute('width','100%');
     rect.setAttribute('height','5em');
-    rect.setAttribute('fill','url(#gradient)');
+    rect.setAttribute('fill','url(#gradient' + pcs +')');
 
-    /* Liitetään elementti html:ään */
+    /* Liitetään svg -elementti html:ään */
     document.body.appendChild(base);
 
     /* lisätään rect -elementti basen lapsoseksi */
@@ -186,9 +234,4 @@ function createBalk(){
     gradient.appendChild(stopFirst);
     gradient.appendChild(stopSecond);
     gradient.appendChild(stopThird); 
-
-
-
-
-
 }

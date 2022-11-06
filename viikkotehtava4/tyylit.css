@@ -31,13 +31,15 @@ html{
 
     position: absolute;
     animation-name: balks;
-    animation-duration: 5s;
+    animation-duration: 8s; /*--> Animaation kesto */
     animation-timing-function: linear;
     animation-direction: alternate;
     animation-iteration-count: infinite;
+    /* animation-delay: 0.10s; */
  }
 
- @keyframes balks {
+/* Animaation transformaatio */
+@keyframes balks {
     from {
         transform: translate(0%,-100%);
     }
@@ -52,12 +54,12 @@ html{
 
 #button{
     position:absolute;
-    z-index: 100;
+    z-index: 1; /*--> Button palkkien ja pingviinien päälle.*/
 }
 
 .penquins{
    
-    animation-duration: 10s;
+    animation-duration: 10s; /*--> Animaation kesto */
     animation-direction: alternate;
     animation-name:penquinsMove;
     animation-timing-function: linear;
@@ -68,7 +70,8 @@ html{
     position:absolute;
     
 }
- 
+
+/* Animaation transformaatio */
 @keyframes penquinsMove{
 
     /* x=0 ja y=0*/
@@ -86,4 +89,59 @@ html{
     /* x=0 ja y=0*/
     to {transform: translate(0vw,0vh);}
    
+}
+
+/* Pöllöjen animaatio tästä alaspäin */
+
+/* Canvaksen animaation ominaisuuksien määrittely */
+.firstCanvas{
+    position: absolute;
+    right: 0vw;
+    
+    animation-duration: 4s; /*--> Animaation kesto */
+    animation-name: firstOwl;
+    animation-iteration-count: infinite;
+    animation-direction: alternate-reverse; /*--> Animaatio jatkaa takaisin, ei pysähdy*/
+    
+    z-index: 1; /*--> Pöllö palkkien ja pingviinien päällä. */
+}
+
+/* Canvaksen animaation ominaisuuksien määrittely */
+.secondCanvas{
+    position: absolute;
+    left: 0vw;
+   
+    animation-duration: 4s; /*--> Animaation kesto */
+    animation-name: secondOwl;
+    animation-iteration-count: infinite;
+    animation-direction: alternate-reverse; /*--> Animaatio jatkaa takaisin, ei pysähdy*/
+
+    z-index: 1; /*--> Pöllö palkkien ja pingviinien päällä. */
+}
+
+
+
+/* Animaation transformaatio */
+@keyframes firstOwl {
+    from {
+    transform: translate(0vw,0vh);
+    }
+
+    to {
+    /* Siirrytään vasemmalle 100 viewport yksikköä vähennettynä kuvan leveys pikseleinä + nolla korkeus*/
+    transform: translate(calc(-100vw + 564px) ,0vh);
+    }
+}
+
+/* Animaation transformaatio */
+@keyframes secondOwl {
+    from {
+    transform: translate(0vw,0vh);
+    }
+
+    to{
+    /* Siirrytään oikealle 100 viewport yksikköä vähennettynä kuvan leveys pikseleinä + nolla korkeus*/
+    transform: translate(calc(100vw - 564px) ,0vh);
+    }
+
 }
