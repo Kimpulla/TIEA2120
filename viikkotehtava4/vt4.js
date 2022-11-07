@@ -1,6 +1,8 @@
 "use strict";
 //@ts-check 
 
+/* Muuttuja n on tulevien palkkien lukumäärä. */
+let n = 10;
 
 window.onload = function() { 
 
@@ -13,6 +15,12 @@ let colors = ["#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#ffff00","#00ff00", "
 /* Uusi väritaulukko, johon jokaiselle palkille väri, eli ["#ff0000" x n, "#00ff00" x n, ..]*/
 let colorArray = []; 
 
+/**
+ * Funktiolla luodaan n määrä palkkeja ominaisuuksineen,
+ * käyttäen apuna createBalk funktiota.
+ * 
+ * @param {*} e 
+ */
 function functionality(e){
 
     let balksClass = e.target;
@@ -24,21 +32,17 @@ function functionality(e){
         colorArray.unshift(last);
         change.style.stopColor = last;
 }
-
-/* Muuttuja n on tulevien palkkien lukumäärä. */
-let n = 10;
-
     while(colors.length >= 1){
 
         let first = colors.shift();
 
     for (let i = 0; i < n; i++){
         colorArray.push(first);
-        console.log(colorArray);
+       
     }
     }
 
-    /* Luodaan n määrä palkkeja */
+    /* Luodaan n määrä palkkeja; Huom! n määritelty koodin alussa! */
     for (let i = 0; i < n; i++){
 
         let pcs = i; /* Luodaan uniikki pääte palkin id:lle. Esim gradient1, gradient2.. */
@@ -58,19 +62,40 @@ let n = 10;
     }
     /* Kutsutaan funktioita */
     drawOwl();
-    button();   
+    button();  
+    slider();
 };
 
+/* Määritellään muuttujat | balkWidth on 1% ruudun korkeudesta 
+| balkWidth2 on 50% ruudun korkeudesta. */
 
+let balkWidth =  (window.innerHeight / 100) * 1;
+let balkWidth2 = (window.innerHeight / 100) * 50;
+
+/* Muuttuja, millä muutetaan palkin paksuutta. */
+let balkWidthC =  (window.innerHeight / 100) * 1;
+
+/**
+ * Funktiolla slider muutetaan palkkien paksuutta.
+ */
 function slider(){
 
-    let pHeight = window.innerHeight;
+let rangeInput = document.getElementById("balkWidth");
 
-    let slider = document.createElement('range');
-    slider.setAttribute('min', pHeight * 1.01);
-    slider.setAttribute('max', pHeight * 1.5);
-
-    document.appendChild(slider);
+/* Asetetaan sliderille min ja max */
+ rangeInput.style.setProperty('--min', balkWidth); 
+ rangeInput.style.setProperty('--max', balkWidth2); 
+ 
+   /* Palkin leveyden kasvattaminen */
+   rangeInput.addEventListener('mouseup', function() {
+       if (this.value >= 1){
+        balkWidthC = this.value;
+        for (let i = 0; i < n; i++){
+            let rect = document.getElementById('balkRect'+ i);
+            rect.setAttribute('height',balkWidthC);
+        }
+       }
+   });
 }
 
 /**
@@ -251,7 +276,8 @@ function createBalk(pcs){
     /* luodaan rect-elementti */
     let rect = document.createElementNS("http://www.w3.org/2000/svg",'rect');
     rect.setAttribute('width','100%');
-    rect.setAttribute('height','10em');
+    rect.setAttribute('id','balkRect' + pcs);
+    rect.setAttribute('height',balkWidthC);
     rect.setAttribute('fill','url(#gradient' + pcs +')');
 
     /* Liitetään svg -elementti html:ään */

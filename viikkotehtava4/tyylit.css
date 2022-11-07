@@ -16,15 +16,36 @@ html{
  
   .stopSecond {
     stop-color: #bf12be;  
- } 
+ }  
  
  .stopThird {
     stop-color: transparent;  
  }
 
+ /* Oli käytössä tasolla yksi*/
  .stopColor {
     stop-color: yellow;
  }
+
+/* Omat muuttujat */ 
+:root {
+    --min: 2;
+}
+:root {
+    --max: 1;
+}
+
+
+
+ /* Palkin paksuuden liukusäädin */
+#balkWidth{
+    position: absolute;
+    z-index: 2;
+    right:0vw;
+    width: 50%;
+    
+}
+
 
  /* Palkkien animaatio tästä eteenpäin */
 .balks{
