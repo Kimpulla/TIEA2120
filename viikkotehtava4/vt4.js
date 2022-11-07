@@ -4,27 +4,42 @@
 
 window.onload = function() { 
 
+/* delay muuttuja viivästää palkkeja. */
 let delay = 0;
+
+/* Annettu väritaulukko */
+let colors = ["#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#ffff00","#00ff00", "#00ffff", "#ffffff"];
+
+/* Uusi väritaulukko, johon jokaiselle palkille väri, eli ["#ff0000" x n, "#00ff00" x n, ..]*/
+let colorArray = []; 
 
 function functionality(e){
 
     let balksClass = e.target;
+
     /* Etsitään stop elmenteistä keskimmäinen, eli stopSceond */
-    let stopSecond = balksClass.firstChild.nextElementSibling.
-                     firstChild.firstChild.nextElementSibling;
+    let change = balksClass.getElementsByClassName('stopSecond')[0];
 
-    let color = stopSecond.getAttribute('class');
-
-    if (color == 'stopSecond'){
-        stopSecond.setAttribute('class','stopColor');
-    }
-     if (color == 'stopColor'){
-        stopSecond.setAttribute('class','stopSecond');
-    }    
+        let last = colorArray.pop();
+        colorArray.unshift(last);
+        change.style.stopColor = last;
 }
 
-/* Luodaan n määrä palkkeja */
-    for (let i = 0; i < 10; i++){
+/* Muuttuja n on tulevien palkkien lukumäärä. */
+let n = 10;
+
+    while(colors.length >= 1){
+
+        let first = colors.shift();
+
+    for (let i = 0; i < n; i++){
+        colorArray.push(first);
+        console.log(colorArray);
+    }
+    }
+
+    /* Luodaan n määrä palkkeja */
+    for (let i = 0; i < n; i++){
 
         let pcs = i; /* Luodaan uniikki pääte palkin id:lle. Esim gradient1, gradient2.. */
         
@@ -45,6 +60,18 @@ function functionality(e){
     drawOwl();
     button();   
 };
+
+
+function slider(){
+
+    let pHeight = window.innerHeight;
+
+    let slider = document.createElement('range');
+    slider.setAttribute('min', pHeight * 1.01);
+    slider.setAttribute('max', pHeight * 1.5);
+
+    document.appendChild(slider);
+}
 
 /**
  * Funktio luo uuden pingviinin napin klikkauksen yhteydessä.
@@ -68,8 +95,10 @@ button.addEventListener('click', createPenquin);
  */
 function drawOwl(){
 
-    let variable = 0;
-    
+    let variableY = 0;
+    let locationOnScreen = window.innerHeight / 2 - 564 / 2;
+
+
     /* Määritellään pöllö */
     let owl = document.createElement('img');
     owl.src = "http://appro.mit.jyu.fi/tiea2120/vt/vt4/owl.png";
@@ -79,10 +108,13 @@ function drawOwl(){
        
         for (let i = 0; i < 16; i++){
 
-            createCanvas(variable,owl);
-            variable = variable + 34.5; /* --> Kasvatetaan variablen arvoa --> seuraava pala 34.5px verran eri kohdasta. */
-            createCanvas2(variable,owl);
-            variable = variable + 34.5;
+            createCanvas(variableY,owl,locationOnScreen);
+            variableY = variableY + 34.5; /* --> Kasvatetaan variablen arvoa --> seuraava pala 34.5px verran eri kohdasta. */
+            locationOnScreen = locationOnScreen + 34.5;
+            
+            createCanvas2(variableY,owl,locationOnScreen);
+            variableY = variableY + 34.5;
+            locationOnScreen = locationOnScreen + 34.5;
         }
     });
 
@@ -95,21 +127,22 @@ function drawOwl(){
  * @param {Number} variable - muuttuja, joilla säädetään palojen välejä
  * @param {*} owl 
  */
- function createCanvas(variable,owl){
+ function createCanvas(variableY,owl,locationOnScreen){
 
     let canvas = document.createElement('canvas');
 
     /* Attribuutit canvakselle */
     canvas.setAttribute('class', 'firstCanvas');
-    canvas.setAttribute('height','35'); // Yhden pykälän korkeus --> 552/16
+    canvas.setAttribute('height','35'); // Yhden pykälän korkeus --> 552/16 (34.5 pyöristetty)
     canvas.setAttribute('width', '564');
 
-    canvas.style.top = "calc(50vh + " + variable + "px" + ")";
-    canvas.style.top = "calc(21vh + " + variable + "px" + ")";
-    
-    /* Haetaan canvaksen konteksti, '2d' mahdollistaa 2 ulottisen piirron */
+    /* Mistä kohtaa pöllön piirto alkaa ruudulla: */
+    canvas.style.top = locationOnScreen + "px";
+
+    /* Haetaan canvaksen konteksti, '2d' mahdollistaa 2 ulotteisen piirron */
     let drawing = canvas.getContext('2d');
-    drawing.drawImage( owl, 0, variable, 564, 35, 0, 0, 564, 35);
+    /* image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight */
+    drawing.drawImage(owl, 0, variableY, 564, 35, 0, 0, 564, 35);
 
     document.body.appendChild(canvas);
 }
@@ -122,21 +155,21 @@ function drawOwl(){
  * @param {Number} variable - muuttuja, joilla säädetään palojen välejä
  * @param {*} owl 
  */
- function createCanvas2(variable,owl){
+ function createCanvas2(variableY,owl,locationOnScreen){
 
     let canvas2 = document.createElement('canvas');
 
     /* Attribuutit canvakselle */
     canvas2.setAttribute('class', 'secondCanvas');
-    canvas2.setAttribute('height','35'); // Yhden pykälän korkeus --> 552/16
+    canvas2.setAttribute('height','35'); // Yhden pykälän korkeus --> 552/16 (34.5 pyöristetty)
     canvas2.setAttribute('width', '564');
 
-    canvas2.style.top = "calc(50vh + " + variable + "px" + ")";
-    canvas2.style.top = "calc(21vh + " + variable + "px" + ")";
+    /* Mistä kohtaa pöllön piirto alkaa ruudulla: */
+    canvas2.style.top = locationOnScreen + "px";
 
     /* Haetaan canvaksen konteksti, '2d' mahdollistaa 2 ulottisen piirron */
     let drawing = canvas2.getContext('2d');
-    drawing.drawImage( owl, 0, variable, 564, 35, 0, 0, 564, 35);
+    drawing.drawImage( owl, 0, variableY, 564, 35, 0, 0, 564, 35);
 
     document.body.appendChild(canvas2);
 }
@@ -197,11 +230,14 @@ function createBalk(pcs){
     gradient.setAttribute('y1','0%');
     gradient.setAttribute('x2','0%');
     gradient.setAttribute('y2','100%');  
+
+    /* Muutetaan basen pituutta, jotta saadaan digonaalipalkit sovitettua näyttöön. */
+    base.style.width = window.innerWidth * 2;
     
     /* Luodaan stop -elementit, joiden avulla säädetään häivettä */
     let stopFirst = document.createElementNS("http://www.w3.org/2000/svg",'stop');
     stopFirst.setAttribute('class','stopFirst');
-    stopFirst.setAttribute('offset','0%');
+    stopFirst.setAttribute('offset','25%');
 
     /* stopSecond merkitsevin, koska tämän väriä muutetaan*/
     let stopSecond = document.createElementNS("http://www.w3.org/2000/svg",'stop');
@@ -210,12 +246,12 @@ function createBalk(pcs){
 
     let stopThird = document.createElementNS("http://www.w3.org/2000/svg",'stop');
     stopThird.setAttribute('class','stopThird');
-    stopThird.setAttribute('offset','100%');
+    stopThird.setAttribute('offset','75%');
     
     /* luodaan rect-elementti */
     let rect = document.createElementNS("http://www.w3.org/2000/svg",'rect');
     rect.setAttribute('width','100%');
-    rect.setAttribute('height','5em');
+    rect.setAttribute('height','10em');
     rect.setAttribute('fill','url(#gradient' + pcs +')');
 
     /* Liitetään svg -elementti html:ään */
