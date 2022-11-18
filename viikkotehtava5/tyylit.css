@@ -1,4 +1,49 @@
 #map {
    width: 100vw;
-   height: 100vh;
+   height: 50vh;
+}
+
+/* Luokan container muutoksia */
+#teams{
+   display: inline-block;
+   text-align: left;
+   margin-left: 10vw;
+   width: 33vw;
+}
+#maps{
+   display: inline-block;
+   text-align: center;
+
+}
+#markers{
+   display: inline-block;
+   text-align: right;
+   width: 33vw;
+   margin-right: 10vw;
+}
+
+
+
+.container1{
+   display: inline-block;
+   text-align: left;
+   margin-left: 3vw;
+   width: 20vw;
+   height: 50vh;
+   border: 3px solid black;
+}
+.container2{
+   display: inline-block;
+   text-align: center;
+   width: 50vw;
+   height: 50vh;
+   border: 3px solid black;
+}
+.container3{
+   display: inline-block;
+   text-align: right;
+   margin-right: 3vw;
+   width: 20vw;
+   height: 50vh;
+   border: 3px solid black;
 }
