@@ -13,10 +13,13 @@ window.addEventListener("load", function(e) {
 
 /* Määritetään taulukoita */
 let joukkueTaulukko = [];
+let rastitTaulukko = [];
 
 /* Kutsutaan metodeja */
 joukkueetDeep();
+//rastitDeep();
 createTeamList();
+createRastitList();
 
 /* Luodaan maastokartta */
 let map = new L.map('map', {
@@ -29,6 +32,7 @@ L.tileLayer.mml_wmts({ layer: "maastokartta", key : "3ad2a499-581c-4212-92d4-b13
 /**
 * Funktiolla luodaan lista joukkueista.
 */
+// TODO: ei tarvi varmaan olla deepcopy, otetaan joukkueet suoraan datasta???
 function createTeamList(){ 
 
 /* Ensimmäinen forms -elementti. */
@@ -54,6 +58,24 @@ function createTeamList(){
  */
 function createRastitList(){
 
+	rastitDeep();
+
+	/* Kolmas forms -elementti. */
+    let form1 = document.forms[2];
+
+	/* Luodaan ul -elementti */
+	let ul = document.createElement("ul");
+	
+	/* Käydään rastit läpi ja lisätään listaukseen */
+    for(let i = 0; i < rastitTaulukko.length; i++){
+              
+        /* Luodaan li -elementti */
+        let li = document.createElement("li");
+        li.appendChild(document.createTextNode(rastitTaulukko[i]["koodi"]));
+        ul.appendChild(li);
+    }
+    form1.appendChild(ul);
+	
 }
             
 /**
@@ -78,6 +100,27 @@ function joukkueetDeep(){
     console.log("JoukkueTaulukko: ");
      console.log(joukkueTaulukko);
 }
+
+
+/**
+* Funktiolla luodaan deepcopy taulukko alkuperäisestä data.rastit taulukosta.
+*/
+function rastitDeep(){
+            
+    let rastit = data.rastit;
+    for (let rasti of rastit) {
+        let rastitAttributes = {
+        id: rasti.id,
+        koodi: rasti.koodi,
+        lat: rasti.lat,
+        lon: rasti.lon  
+        };
+    	rastitTaulukko.push(rastitAttributes);      
+    }
+	rastitTaulukko.sort(compareRastit);
+    console.log("rastitTaulukko: ");
+     console.log(rastitTaulukko);
+}
             
             
 /** 
@@ -97,6 +140,30 @@ function compareJoukkue(joukkue1, joukkue2) {
     }
     	return 0;
 }
+
+
+
+/** 
+* Apufunktio, joka vertailee joukkeuiden nimiä.
+*
+* @param {String} joukkue1
+* @param {String} joukkue2
+* @returns -1, 0 tai 1
+*/
+function compareRastit(rasti1, rasti2) {
+            
+    if (rasti1.koodi.toLowerCase() < rasti2.koodi.toLowerCase()) {
+        return 1;
+    }
+    if (rasti1.koodi.toLowerCase() > rasti2.koodi.toLowerCase()) {
+        return -1;
+    }
+    	return 0;
+}
+
+
+
+  
             
             
 

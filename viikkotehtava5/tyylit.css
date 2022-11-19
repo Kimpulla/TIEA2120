@@ -22,16 +22,23 @@
    margin-right: 10vw;
 }
 
+/* Rastit jaetaan neljään osaan. */
+#rastit ul{
+   column-count: 4;
+   column-gap: 20px;
+}
 
-
+ul{
+   list-style: none;
+}
+/*TODO: CONTAINERIT SAMALLE TASOLLE */
 .container1{
    display: inline-block;
-   text-align: left;
    margin-left: 3vw;
    width: 20vw;
- 
    border: 3px solid black;
 }
+
 .container2{
    display: inline-block;
    text-align: center;
@@ -41,9 +48,7 @@
 }
 .container3{
    display: inline-block;
-   text-align: right;
    margin-right: 3vw;
    width: 20vw;
-   height: 50vh;
    border: 3px solid black;
 }
