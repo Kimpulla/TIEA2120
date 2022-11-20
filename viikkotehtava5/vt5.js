@@ -26,7 +26,89 @@ let map = new L.map('map', {
 crs: L.TileLayer.MML.get3067Proj()
 }).setView([62.2333, 25.7333], 11);
 L.tileLayer.mml_wmts({ layer: "maastokartta", key : "3ad2a499-581c-4212-92d4-b1342b7a366d" }).addTo(map);
-            
+
+////MEEEEMI
+
+let popup = L.popup();
+
+function onMapClick(e) {
+    popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(map);
+}
+
+map.on('click', onMapClick);
+
+
+let circle = L.circle([62.234017, 25.768838], {
+    color: 'red',
+    fillColor: '#f03',
+    fillOpacity: 0.5,
+    radius: 25
+}).addTo(map);  
+
+let popup2 = L.popup()
+    .setLatLng([62.234017, 25.768838])
+    .setContent("affu asuu täällä.")
+    .openOn(map);
+
+
+
+///////////
+
+
+let items = document.querySelectorAll('.item');
+let ul = document.getElementById("list");
+let columns = document.querySelectorAll('.container1');
+
+let dragItem = null;
+
+
+items.forEach(item => {
+    item.addEventListener('dragstart', dragStart);
+    item.addEventListener('dragend', dragEnd);
+});
+
+function dragStart() {
+    console.log('drag started');
+    dragItem = this;
+    //setTimeout(() => this.className = 'invisible', 0);
+}
+function dragEnd() {
+    console.log('drag ended');
+    this.className = 'item';
+    this.parentNode.removeChild(this);
+    ul.appendChild(dragItem);
+    dragItem = null;
+    
+}
+
+columns.forEach(column => {
+    column.addEventListener('dragover', dragOver);
+    column.addEventListener('dragenter', dragEnter);
+    column.addEventListener('dragleave', dragLeave);
+    column.addEventListener('drop', dragDrop);
+});
+
+
+function dragOver() {
+    e.preventDefault();
+    console.log('drag over');
+}
+function dragEnter() {
+    console.log('drag entered');
+}
+function dragLeave() {
+    console.log('drag left');
+}
+function dragDrop() {
+    e.preventDefault();
+    console.log('drag dropped');
+    this.append(dragItem);
+}
+
+
 
 
 /**
@@ -44,9 +126,14 @@ function createTeamList(){
             
     /* Käydään joukkueet läpi ja lisätään listaukseen */
     for(let i = 0; i < joukkueTaulukko.length;i++){
+
+        let id = joukkueTaulukko[i]["nimi"];
               
         /* Luodaan li -elementti */
         let li = document.createElement("li");
+        li.setAttribute("id", id);
+        li.setAttribute("class", "item");
+        li.setAttribute("draggable","true");
         li.appendChild(document.createTextNode(joukkueTaulukko[i]["nimi"]));
         ul.appendChild(li);
     }
@@ -61,7 +148,7 @@ function createRastitList(){
 	rastitDeep();
 
 	/* Kolmas forms -elementti. */
-    let form1 = document.forms[2];
+    let form1 = document.forms[1];
 
 	/* Luodaan ul -elementti */
 	let ul = document.createElement("ul");
@@ -104,6 +191,7 @@ function joukkueetDeep(){
 
 /**
 * Funktiolla luodaan deepcopy taulukko alkuperäisestä data.rastit taulukosta.
+*TODO: RASTIT KÄÄNTEISEEN AAKKOSJ
 */
 function rastitDeep(){
             
