@@ -118,7 +118,8 @@ function dragDrop() {
 function createTeamList(){ 
 
 /* Ensimmäinen forms -elementti. */
-    let form = document.forms[0];
+  //  let form = document.forms[0];
+  let div1 = document.getElementById("joukkueet");
                         
     /* Luodaan ul -elementti ja järjestetään taulukko*/
     let ul = document.createElement("ul");
@@ -137,7 +138,7 @@ function createTeamList(){
         li.appendChild(document.createTextNode(joukkueTaulukko[i]["nimi"]));
         ul.appendChild(li);
     }
-    form.appendChild(ul);
+    div1.appendChild(ul);
 }
 
 /**
@@ -148,20 +149,26 @@ function createRastitList(){
 	rastitDeep();
 
 	/* Kolmas forms -elementti. */
-    let form1 = document.forms[1];
+    //let form1 = document.forms[1];
+    let div3 = document.getElementById("rastit");
 
 	/* Luodaan ul -elementti */
 	let ul = document.createElement("ul");
 	
 	/* Käydään rastit läpi ja lisätään listaukseen */
     for(let i = 0; i < rastitTaulukko.length; i++){
+
+        let id = rastitTaulukko[i]["koodi"];
               
         /* Luodaan li -elementti */
         let li = document.createElement("li");
+        li.setAttribute("id", id);
+        li.setAttribute("class", "item");
+        li.setAttribute("draggable","true");
         li.appendChild(document.createTextNode(rastitTaulukko[i]["koodi"]));
         ul.appendChild(li);
     }
-    form1.appendChild(ul);
+    div3.appendChild(ul);
 	
 }
             

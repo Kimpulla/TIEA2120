@@ -5,22 +5,25 @@
 
 /* Luokan container muutoksia */
 #teams{
-   display: inline-block;
-   text-align: left;
-   margin-left: 10vw;
-   width: 33vw;
-}
-#maps{
-   display: inline-block;
    text-align: center;
 
+   width: 100%;
+}
+#maps{
+
+   width: 100%;
+   text-align: center;
 }
 #markers{
-   display: inline-block;
-   text-align: right;
-   width: 33vw;
-   margin-right: 10vw;
+   width: 100%;
+   text-align: center;
+} 
+
+#headers{
+   display: flex;
+   align-items: center;
 }
+
 
 /* Rastit jaetaan neljään osaan. */
 #rastit ul{
@@ -31,11 +34,19 @@
 ul{
    list-style: none;
 }
-/*TODO: CONTAINERIT SAMALLE TASOLLE */
+
+#base {
+   display: flex;
+   align-items: center;
+}
+
+/*TODO: skaalaaminen kuntoon*/
+
 .container1{
    display: inline-block;
    margin-left: 3vw;
    width: 20vw;
+   height: 58vh;
    border: 3px solid black;
 }
 
@@ -43,12 +54,16 @@ ul{
    display: inline-block;
    text-align: center;
    width: 50vw;
-   height: 50vh;
+   height: 58vh;
+   margin-left: 1.5vw;
+   margin-right: 1.5vw;
    border: 3px solid black;
+   resize: none;
 }
 .container3{
    display: inline-block;
    margin-right: 3vw;
    width: 20vw;
+   height: 58vh;
    border: 3px solid black;
-}
+} 
