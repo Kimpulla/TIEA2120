@@ -15,10 +15,10 @@ window.addEventListener("load", function(e) {
 let joukkueTaulukko = [];
 let rastitTaulukko = [];
 let rastitLatLon= [];
+let leimaukset = [];
 
 /* Kutsutaan metodeja */
 joukkueetDeep();
-//rastitDeep();
 createTeamList();
 createRastitList();
 
@@ -42,27 +42,45 @@ rastitTaulukko.forEach(function(coord) {
   });
 
 /* Piirretään reitti */
-//drawPath();
+function drawPath(param){
 
-function drawPath(){
+let pointlist = [];
+let rastinId = [];
 
 for(let joukkue of joukkueTaulukko){
+    
+    for(let leimaus of joukkue.rastileimaukset){
 
-    let polygon = L.polygon([
-    getLatLon(getRastinId)
-    ]).addTo(map);
+        if(leimaus.rasti != "" && leimaus.rasti != undefined){
+            // Lista joukkueen rastien koordinaateista 
+            rastinId = getRastinId(leimaus.rasti);
+            pointlist.push(rastinId);
+            console.log("pointlist");
+            console.log(pointlist);
+            
+        }
+    }
+    let polyline = new L.Polyline(pointlist, {
+        color: joukkue.vari,
+        weight: 3,
+        opacity: 0.5,
+        smoothFactor: 1
+    });
+    polyline.addTo(map);
+    pointlist = [];
 }
-}
 
 
+
+} 
 
 /* Plään --> Rastien id --> idn perusteella lat ja lon --> piirretään polku */
 
 function getLatLon(id){
 
     for(let i = 0; i < rastitTaulukko.length;i++){
-        if(id === rastitTaulukko[i]["id"]){
-            rastitLatLon.push([rastitTaulukko[i]["lat"], rastitTaulukko[i]["lon"]]);
+        if(id === rastitTaulukko[i].id){
+            rastitLatLon.push([rastitTaulukko[i].lat, rastitTaulukko[i].lon]);
             return rastitLatLon;
         }
     }
@@ -71,13 +89,16 @@ function getLatLon(id){
 
 
 /* Joukkueen rastin id */
-function getRastinId(){
+function getRastinId(rastileimaus){
 
-    let id;
-    for(let i = 0; i < joukkueTaulukko.length; i++){
-        id = joukkueTaulukko[i].rastileimaukset[i]["rasti"];
-        console.log(id);
-        return id;
+    let array = [];
+
+    for(let rasti of data.rastit){
+
+        if(rasti.id == rastileimaus){
+            array.push(rasti.lat,rasti.lon);      
+            return array;
+        }
     }
 }
 
@@ -121,28 +142,38 @@ let dragItem = null;
 items.forEach(item => {
     item.addEventListener('dragstart', dragStart);
     item.addEventListener('dragend', dragEnd);
+    item.addEventListener('drop', dragDrop);
 });
 
 function dragStart() {
     console.log('drag started');
     dragItem = this;
-    //setTimeout(() => this.className = 'invisible', 0);
+    e.dataTransfer.setData("text/plain", items.getAttribute("id"));
 }
+
 function dragEnd() {
     console.log('drag ended');
     this.className = 'item';
     this.parentNode.removeChild(this);
     ul.appendChild(dragItem);
     dragItem = null;
-    drawPath();
-    
 }
+
+function dragDrop() {
+    e.preventDefault();
+   // console.log('drag dropped');
+   // this.append(dragItem);
+   let data = e.dataTransfer.getData("text/plain");
+   e.target.appendChild(document.getElementById(data));
+    drawPath(e.target);
+    
+} 
 
 columns.forEach(column => {
     column.addEventListener('dragover', dragOver);
     column.addEventListener('dragenter', dragEnter);
     column.addEventListener('dragleave', dragLeave);
-    column.addEventListener('drop', dragDrop);
+    //column.addEventListener('drop', dragDrop);
 });
 
 
@@ -156,11 +187,7 @@ function dragEnter() {
 function dragLeave() {
     console.log('drag left');
 }
-function dragDrop() {
-    e.preventDefault();
-    console.log('drag dropped');
-    this.append(dragItem);
-}
+
 
 
 
@@ -189,6 +216,7 @@ function createTeamList(){
         /* Luodaan li -elementti */
         let li = document.createElement("li");
         li.style.backgroundColor = rainbow(joukkueTaulukko.length,i);
+        joukkueTaulukko[i].vari = li.style.backgroundColor;
         li.setAttribute("id", id);
         li.setAttribute("class", "item");
         li.setAttribute("draggable","true");
@@ -220,6 +248,7 @@ function createRastitList(){
         /* Luodaan li -elementti */
         let li = document.createElement("li");
         li.style.backgroundColor = rainbow(rastitTaulukko.length,i);
+        
         li.setAttribute("id", id);
         li.setAttribute("class", "item");
         li.setAttribute("draggable","true");
@@ -227,8 +256,22 @@ function createRastitList(){
         ul.appendChild(li);
     }
     div3.appendChild(ul);
-	
+
 }
+
+
+/* function leimauksetDeep(){
+            
+    let joukkueet = joukkueTaulukko;
+    for (let joukkue of joukkueet) {
+        let rastiAttributes = {
+            id: joukkue.getRastinId
+        };
+    	leimaukset.push(rastiAttributes);      
+    }
+    console.log("leimausket: ");
+     console.log(leimaukset);
+} */
             
 /**
 * Funktiolla luodaan deepcopy taulukko alkuperäisestä data.joukkueet taulukosta.
