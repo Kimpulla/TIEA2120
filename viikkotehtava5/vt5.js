@@ -14,6 +14,7 @@ window.addEventListener("load", function(e) {
 /* Määritetään taulukoita */
 let joukkueTaulukko = [];
 let rastitTaulukko = [];
+let rastitLatLon= [];
 
 /* Kutsutaan metodeja */
 joukkueetDeep();
@@ -21,41 +22,67 @@ joukkueetDeep();
 createTeamList();
 createRastitList();
 
+
 /* Luodaan maastokartta */
 let map = new L.map('map', {
 crs: L.TileLayer.MML.get3067Proj()
-}).setView([62.2333, 25.7333], 11);
+}).setView([62.118612, 25.628503], 10);
 L.tileLayer.mml_wmts({ layer: "maastokartta", key : "3ad2a499-581c-4212-92d4-b1342b7a366d" }).addTo(map);
 
-////MEEEEMI
 
-let popup = L.popup();
 
-function onMapClick(e) {
-    popup
-        .setLatLng(e.latlng)
-        .setContent("You clicked the map at " + e.latlng.toString())
-        .openOn(map);
+/* Piirretään ympyrät */
+rastitTaulukko.forEach(function(coord) {
+    let circle = L.circle(coord, {
+      color: 'red',
+      fillColor: '#f03',
+      fillOpacity: 0.5,
+      radius: 50
+    }).addTo(map);
+  });
+
+/* Piirretään reitti */
+//drawPath();
+
+function drawPath(){
+
+for(let joukkue of joukkueTaulukko){
+
+    let polygon = L.polygon([
+    getLatLon(getRastinId)
+    ]).addTo(map);
 }
 
-map.on('click', onMapClick);
+}
+
+console.log( getLatLon(getRastinId));
+
+/* Plään --> Rastien id --> idn perusteella lat ja lon --> piirretään polku */
+
+function getLatLon(id){
+
+    for(let i = 0; i < rastitTaulukko.length;i++){
+        if(id === rastitTaulukko[i]["id"]){
+            rastitLatLon.push([rastitTaulukko[i]["lat"], rastitTaulukko[i]["lon"]]);
+            return rastitLatLon;
+        }
+    }
+    rastitLatLon = [];
+}
 
 
-let circle = L.circle([62.234017, 25.768838], {
-    color: 'red',
-    fillColor: '#f03',
-    fillOpacity: 0.5,
-    radius: 25
-}).addTo(map);  
+/* Joukkueen rastin id */
+function getRastinId(){
 
-let popup2 = L.popup()
-    .setLatLng([62.234017, 25.768838])
-    .setContent("affu asuu täällä.")
-    .openOn(map);
-
+    let id;
+    for(let i = 0; i < joukkueTaulukko.length; i++){
+        id = joukkueTaulukko[i].rastileimaukset[i]["rasti"];
+        console.log(id);
+        return id;
+    }
+}
 
 
-///////////
 
 
 let items = document.querySelectorAll('.item');
@@ -81,6 +108,7 @@ function dragEnd() {
     this.parentNode.removeChild(this);
     ul.appendChild(dragItem);
     dragItem = null;
+    drawPath();
     
 }
 
