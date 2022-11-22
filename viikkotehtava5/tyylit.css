@@ -1,21 +1,30 @@
 #map {
    width: 100vw;
-   height: 70vh;
+   height: 50vh;
 }
 
-/* Luokan container muutoksia */
+html{
+
+   height: 100vh;
+   overflow: hidden;
+   
+}
+body{
+   overflow: hidden;
+}
+
+
 #teams{
    text-align: center;
-
-   width: 100%;
+   width: 60vw;
 }
 #maps{
-
-   width: 100%;
    text-align: center;
+   width: 100%;
+
 }
 #markers{
-   width: 100%;
+   width: 70vw;
    text-align: center;
 } 
 
@@ -33,37 +42,52 @@
 
 ul{
    list-style: none;
+   font-size: small;
 }
 
+/* Container, jonka sisällä seuraavat 3 containeria*/
 #base {
-   display: flex;
-   align-items: center;
+  /*  display: flex;*/
+   align-items: center; 
+   width: 100vw;
+   height: 50vh;
 }
-
-/*TODO: skaalaaminen kuntoon*/
-
-.container1{
-   display: inline-block;
-   margin-left: 3vw;
+/*container1*/
+#rastit{
+   margin-right: 1vw;
+   width: 20vw;
+   height: 58vh;
+   border: 3px solid black;
+   float:left;
+   overflow: hidden;
+} 
+/*container2*/
+#joukkueet{
+   overflow: hidden;
+   float: left;
+   margin-left: 1vw;
    width: 20vw;
    height: 58vh;
    border: 3px solid black;
 }
-
-.target{
-   display: inline-block;
-   text-align: center;
+/*container3*/
+#targetDiv{
+   position: relative;
    width: 50vw;
    height: 58vh;
    margin-left: 1.5vw;
    margin-right: 1.5vw;
    border: 3px solid black;
-   resize: none;
+   float:left;
+   overflow: hidden;
 }
-.container3{
-   display: inline-block;
-   margin-right: 3vw;
-   width: 20vw;
-   height: 58vh;
-   border: 3px solid black;
-} 
+
+/* ID-ul muutoksia*/
+#teamUL{
+   padding-left: 0vw;
+   margin-top: 0vh;
+}
+#rastitUL{
+   padding-left: 0vw;
+   margin-top: 0vh;
+}
