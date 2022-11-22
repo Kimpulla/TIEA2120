@@ -1,40 +1,44 @@
+
 #map {
    width: 100vw;
    height: 50vh;
 }
 
+/* Sivu */
 html{
-
    height: 100vh;
    overflow: hidden;
-   
 }
+
 body{
    overflow: hidden;
 }
 
-
+/* Otsikko */
 #teams{
    text-align: center;
    width: 60vw;
 }
+/* Otsikko */
 #maps{
    text-align: center;
    width: 100%;
-
 }
+/* Otsikko */
 #markers{
    width: 70vw;
    text-align: center;
 } 
-
+/* Otsikkojen yhteinen div */
 #headers{
+   margin-top: -2vh;
    display: flex;
    align-items: center;
 }
 
-
-/* Rastit jaetaan neljään osaan. */
+/* Rastit jaetaan neljään osaan. 
+ * ul -elementtien muutoksia tästä alaspäin.
+ */
 #rastit ul{
    column-count: 4;
    column-gap: 20px;
@@ -44,50 +48,53 @@ ul{
    list-style: none;
    font-size: small;
 }
+/* joukkueiden ul */
+#teamUL{
+   padding-left: 0vw;
+   margin-top: 0vh;
+}
+/* rastien ul */
+#rastitUL{
+   padding-left: 0vw;
+   margin-top: 0vh;
+}
 
 /* Container, jonka sisällä seuraavat 3 containeria*/
 #base {
-  /*  display: flex;*/
    align-items: center; 
    width: 100vw;
    height: 50vh;
+
 }
+
 /*container1*/
 #rastit{
    margin-right: 1vw;
    width: 20vw;
-   height: 58vh;
+   height: 42vh;
    border: 3px solid black;
    float:left;
    overflow: hidden;
 } 
+
 /*container2*/
 #joukkueet{
    overflow: hidden;
    float: left;
    margin-left: 1vw;
    width: 20vw;
-   height: 58vh;
+   height: 42vh;
    border: 3px solid black;
 }
+
 /*container3*/
 #targetDiv{
    position: relative;
    width: 50vw;
-   height: 58vh;
+   height: 42vh;
    margin-left: 1.5vw;
    margin-right: 1.5vw;
    border: 3px solid black;
    float:left;
    overflow: hidden;
-}
-
-/* ID-ul muutoksia*/
-#teamUL{
-   padding-left: 0vw;
-   margin-top: 0vh;
-}
-#rastitUL{
-   padding-left: 0vw;
-   margin-top: 0vh;
 }

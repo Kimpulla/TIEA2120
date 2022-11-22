@@ -9,29 +9,22 @@ window.addEventListener("load", function(e) {
 	    .then(function(data) {
             console.log(data);
             
-
-
 /* Määritetään taulukoita */
 let joukkueTaulukko = [];
 let rastitTaulukko = [];
-let rastitLatLon= [];
-let leimaukset = [];
 
 /* Kutsutaan metodeja */
 joukkueetDeep();
 createTeamList();
 createRastitList();
 
-
 /* Luodaan maastokartta */
 let map = new L.map('map', {
 crs: L.TileLayer.MML.get3067Proj()
-}).setView([62.118612, 25.628503], 7.7);
+}).setView([62.118612, 25.628503], 10);
 L.tileLayer.mml_wmts({ layer: "maastokartta", key : "3ad2a499-581c-4212-92d4-b1342b7a366d" }).addTo(map);
 
-
-
-/* Piirretään ympyrät */
+/* Piirretään ympyrät eli rastit*/
 rastitTaulukko.forEach(function(coord) {
     let circle = L.circle(coord, {
       color: 'red',
@@ -41,66 +34,11 @@ rastitTaulukko.forEach(function(coord) {
     }).addTo(map);
   });
 
-/* /* Piirretään reitti */
-/* function drawPath(param){
-
-let pointlist = [];
-let rastinId = [];
-
-for(let joukkue of joukkueTaulukko){
-    
-    for(let leimaus of joukkue.rastileimaukset){
-
-        if(leimaus.rasti != "" && leimaus.rasti != undefined){
-            // Lista joukkueen rastien koordinaateista 
-            rastinId = getRastinId(leimaus.rasti);
-            pointlist.push(rastinId);
-            console.log("pointlist");
-            console.log(pointlist);
-            
-        }
-    }
-    let polyline = new L.Polyline(pointlist, {
-        color: joukkue.vari,
-        weight: 3,
-        opacity: 0.5,
-        smoothFactor: 1
-    });
-    polyline.addTo(map);
-    pointlist = [];
-}
-
-
-
-}   */
-
-/* Plään --> Rastien id --> idn perusteella lat ja lon --> piirretään polku */
-
-/* function getLatLon(id){
-
-    for(let i = 0; i < rastitTaulukko.length;i++){
-        if(id === rastitTaulukko[i].id){
-            rastitLatLon.push([rastitTaulukko[i].lat, rastitTaulukko[i].lon]);
-            return rastitLatLon;
-        }
-    }
-    rastitLatLon = [];
-}
- */
-
-/* Joukkueen rastin id */
-function getRastinId(rastileimaus){
-
-    let array = [];
-
-    for(let rasti of data.rastit){
-
-        if(rasti.id == rastileimaus){
-            array.push(rasti.lat,rasti.lon);      
-            return array;
-        }
-    }
-}
+/* Keskitetään kartta käyttäen fitboundsia
+*  --> rastit näkyvät kartalla selainikkunan koonkin muuttuessa.
+*  lat ja lon otettu pisimmän halkaisijan kohdalta rastien väliltä.
+*/
+map.fitBounds([[62.16435, 25.490042],[62.07737,  25.735731]]); 
 
 /**
  * Funktiolla värjätään asioita.
@@ -130,7 +68,7 @@ function rainbow(numOfSteps, step) {
     return (c);
 }
 
-/* Asetetaan keskimmiselle diville ominaisuuksia, kuten
+/* Asetetaan keskimmäiselle diville ominaisuuksia/tapahtumia, kuten
  * dragover ja drop
  */
 const target = document.getElementById('targetDiv');
@@ -149,17 +87,21 @@ target.addEventListener('drop',(e) => {
     dropThis.style.display = 'inline';
     let pasteWidth = dropThis.clientWidth;
     
+    /* Ul -elementti */
     let ul = document.createElement('ul');
     ul.style.position = 'absolute';
     e.target.appendChild(ul);
     
+    /* Elementin leveys ja korkeus %. */
     let targetWidth = ( e.offsetX / target.clientWidth ) * 100;
     let targetHeight = ( e.offsetY / target.clientHeight ) * 100;
 
-
-	ul.style.width = "" + pasteWidth + "px";
-	ul.style.top = "" + targetHeight+ "%";
-    ul.style.left = "" +  targetWidth + "%";
+    /* Muutetaan ul -elementin tyyliä, jotta saadaan keskitettyä
+     * elementit raahatessa ne keskimmäiseen div/ul.
+    */
+	ul.style.width  = "" +  pasteWidth      +   "px";
+	ul.style.top    = "" +  targetHeight    +   "%";
+    ul.style.left   = "" +  targetWidth     +   "%";
 
 	ul.appendChild(dropThis);
 
@@ -172,23 +114,24 @@ target.addEventListener('drop',(e) => {
             let vari = dropThis.style.backgroundColor;
             let xyz = getLatLon(createPathArray(idLahto(data), idMaali(data), trueName, data), data);
 
+            /* Polylinen piirto saaduiosta xy koordinaateista. */
             let polyline = L.polyline(xyz, {
                 color: vari
             }).addTo(map);
                     
-            dropThis.polyline = polyline;
+            dropThis.polyline = polyline; /* Tallennetaan toistaiseksi. */
          }
 });
-
 
 /**
  * Funktiolla järjestetään joukkueen rastit järjestykseen.
  * Lopulta palautetaan rastit taulukossa.
  * 
- * @param {String} lahtoId 
- * @param {String} maaliId 
- * @param {Obejct} joukkue
+ * @param {String} lahtoId rastin lahto id
+ * @param {String} maaliId rastin maali id
+ * @param {Obejct} joukkue joukkue
  * @param {data} data
+ * @returns taulukon, jossa rastit.
  */
 function createPathArray(lahtoId, maaliId, joukkue, data){
 
@@ -218,18 +161,12 @@ function createPathArray(lahtoId, maaliId, joukkue, data){
     /* Tarkastetaan onko "LAHTO":ja useampia, jos on laitetaan niistä viimeinen taulukkoon. */
     if (start.length > 1){
         combined.push(start[start.length - 1]);
-        console.log(combined);
     }
     else {
         combined.push(...start);
-        console.log(combined);
     }
-
     combined.push(...other);
     combined.push(finish);
-
-    console.log("combined array");
-    console.log(combined);
 
     let ready = [];
 
@@ -240,7 +177,6 @@ function createPathArray(lahtoId, maaliId, joukkue, data){
 return ready;
 }
 
-
 /**
  * Funktiolla muodostetaan saadusta rastitaulukosta latLon taulukko.
  * Esim. latLonArray = [62.123, 25.123...]
@@ -249,16 +185,16 @@ return ready;
  * @param {data} data Tietorakenne
  * @returns lat-lon taulukon.
  */
-function getLatLon(array, data){
+function getLatLon(array){
 
     let latLonArray = [];
     let inProgress= [];
 
-    for ( let i = 0; i < array.length; i++){ //TODO: EHKÄ DATA POIS?
-        for ( let rasti of data.rastit){
+    for ( let i = 0; i < array.length; i++){
+        for ( let rasti of rastitTaulukko){
 
             if( rasti.id == array[i]){
-                
+
                 /* Nollataan, ettei tule ylimääräisiä */
                 inProgress= [];
 
@@ -274,8 +210,6 @@ function getLatLon(array, data){
     }
 return latLonArray;
 }
-
-
 
 /**
  * Funktio hakee joukkueen nimen, joka vastaa parametria.
@@ -297,10 +231,9 @@ function teamNameLi(liName){
 /**
 * Funktiolla luodaan lista joukkueista.
 */
-// TODO: ei tarvi varmaan olla deepcopy, otetaan joukkueet suoraan datasta???
 function createTeamList(){ 
 
-/* Ensimmäinen forms -elementti. */
+/* Ensimmäinen div -elementti. */
   let div1 = document.getElementById("joukkueet");
                         
     /* Luodaan ul -elementti ja järjestetään taulukko*/
@@ -317,7 +250,7 @@ function createTeamList(){
         let li = document.createElement("li");
         li.style.backgroundColor = rainbow(joukkueTaulukko.length,i);
         joukkueTaulukko[i].vari = li.style.backgroundColor;
-        li.setAttribute("id", id);
+        li.setAttribute("id", "" + id.replaceAll(" ", ""));
         li.setAttribute("class", "item");
         li.setAttribute("draggable","true");
         li.appendChild(document.createTextNode(joukkueTaulukko[i]["nimi"]));
@@ -355,18 +288,16 @@ function createTeamList(){
 
         if ( ramID.getAttribute('class') == 'item' ){
             
-            let teamUL = document.getElementById('joukkueul');
+            let teamUL = document.getElementById('teamUL');
             ramID.style.display = 'block';
 
             /* Viivojen poisto */
-            let polylineulos = ramID.polyline;
-            polylineulos.remove(map);
+            let removePL = ramID.polyline;
+            removePL.remove(map);
            
             teamUL.appendChild(document.getElementById(ram));
         }
-    
-        });
-
+    });
 }
 
 /**
@@ -374,10 +305,10 @@ function createTeamList(){
  */
 function createRastitList(){
 
+    /* Kutsutaan metodia, joka luo rastitaulukon */
 	rastitDeep();
 
-	/* Kolmas forms -elementti. */
-    //let form1 = document.forms[1];
+	/* Kolmas div -elementti. */
     let div3 = document.getElementById("rastit");
 
 	/* Luodaan ul -elementti */
@@ -398,9 +329,45 @@ function createRastitList(){
         li.setAttribute("draggable","true");
         li.appendChild(document.createTextNode(rastitTaulukko[i]["koodi"]));
         ul.appendChild(li);
+        drag(li);
     }
     div3.appendChild(ul);
 
+    let rastitUL = document.getElementById("rastitUL");
+
+    /**
+     * Lisätään li -elementille drag, dragover ja drop ominaisuudet.
+     * Lisäksi piirretään viivat rastien välillä.
+     * 
+     * @param {li} li 
+     */
+    function drag(li){
+        li.addEventListener("dragstart", function(e) {
+            /* Elementin id-attribuutin arvo. */
+			e.dataTransfer.setData("text/plain", li.getAttribute("id"));
+		});	
+    }
+
+    /* Dragover */
+    rastitUL.addEventListener("dragover", function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move"; /* Move efekti */
+    });
+
+    /* Drop */
+    rastitUL.addEventListener("drop", function(e) {
+        e.preventDefault();
+        let ram = e.dataTransfer.getData("text/plain");
+        let ramID = document.getElementById(ram);
+
+        if ( ramID.getAttribute('class') == 'item2' ){
+            
+            let rastitUL = document.getElementById('rastitUL');
+            ramID.style.display = 'block';
+
+            rastitUL.appendChild(document.getElementById(ram));
+        }
+    });
 }
        
 /**
@@ -422,14 +389,10 @@ function joukkueetDeep(){
         };
     	joukkueTaulukko.push(joukkueAttr);      
     }
-    console.log("JoukkueTaulukko: ");
-     console.log(joukkueTaulukko);
 }
-
 
 /**
 * Funktiolla luodaan deepcopy taulukko alkuperäisestä data.rastit taulukosta.
-*TODO: RASTIT KÄÄNTEISEEN AAKKOSJ
 */
 function rastitDeep(){
             
@@ -444,11 +407,8 @@ function rastitDeep(){
     	rastitTaulukko.push(rastitAttributes);      
     }
 	rastitTaulukko.sort(compareRastit);
-    console.log("rastitTaulukko: ");
-     console.log(rastitTaulukko);
 }
-            
-            
+             
 /** 
 * Apufunktio, joka vertailee joukkeuiden nimiä.
 *
@@ -468,7 +428,7 @@ function compareJoukkue(joukkue1, joukkue2) {
 }
 
 /** 
-* Apufunktio, joka jarjestaa rastit.
+* Apufunktio, joka jarjestaa rastit käänteiseen järjestykseen.
 *
 * @param {String} rasti1
 * @param {String} rasti2
@@ -484,7 +444,6 @@ function compareRastit(rasti1, rasti2) {
     }
     	return 0;      
 }
-
 
 /** 
 * Apufunktio, joka jarjestaa rastit ajan perusteella.
@@ -512,17 +471,13 @@ function compareRastitAika(rasti1, rasti2) {
 function idLahto(){
 
 let lahtoID;
-
 for (let rasti of rastitTaulukko){
-
     if(rasti.koodi == 'LAHTO'){
         lahtoID = rasti.id;
         return lahtoID;
     }
 }
-
 }
-
 
 /**
  * Apufunktio, joka palauttaa sen rastin ID:n, jolla on koodina "MAALI".
@@ -530,9 +485,7 @@ for (let rasti of rastitTaulukko){
  * @returns rastin koodilla "MAALI" id.
  */
  function idMaali(){
-
     let maaliID;
-    
     for (let rasti of rastitTaulukko){
     
         if(rasti.koodi == 'MAALI'){
@@ -542,10 +495,5 @@ for (let rasti of rastitTaulukko){
     }
     
     }
-
-      
-
-
-
-	    });
+});
 });
