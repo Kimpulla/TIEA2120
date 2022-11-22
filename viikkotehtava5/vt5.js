@@ -59,7 +59,7 @@ console.log( getLatLon(getRastinId));
 
 /* Plään --> Rastien id --> idn perusteella lat ja lon --> piirretään polku */
 
-/* function getLatLon(id){
+function getLatLon(id){
 
     for(let i = 0; i < rastitTaulukko.length;i++){
         if(id === rastitTaulukko[i]["id"]){
@@ -69,7 +69,7 @@ console.log( getLatLon(getRastinId));
     }
     rastitLatLon = [];
 }
- */
+
 
 /* Joukkueen rastin id */
 function getRastinId(){
@@ -82,42 +82,161 @@ function getRastinId(){
     }
 }
 
-
-
-
-let items = document.querySelectorAll('.item');
-let ul = document.getElementById("list");
-let columns = document.querySelectorAll('.container1');
-
-let dragItem = null;
-
-
-items.forEach(item => {
-    item.addEventListener('dragstart', dragStart);
-    item.addEventListener('dragend', dragEnd);
-});
-
-function dragStart() {
-    console.log('drag started');
-    dragItem = this;
-    //setTimeout(() => this.className = 'invisible', 0);
+/**
+ * Funktiolla värjätään asioita.
+ * 
+ * @param {*} numOfSteps 
+ * @param {*} step 
+ * @returns 
+ */
+function rainbow(numOfSteps, step) {
+    // This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal for creating easily distinguishable vibrant markers in Google Maps and other apps.
+    // Adam Cole, 2011-Sept-14
+    // HSV to RBG adapted from: http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+    let r, g, b;
+    let h = step / numOfSteps;
+    let i = ~~(h * 6);
+    let f = h * 6 - i;
+    let q = 1 - f;
+    switch(i % 6){
+        case 0: r = 1; g = f; b = 0; break;
+        case 1: r = q; g = 1; b = 0; break;
+        case 2: r = 0; g = 1; b = f; break;
+        case 3: r = 0; g = q; b = 1; break;
+        case 4: r = f; g = 0; b = 1; break;
+        case 5: r = 1; g = 0; b = q; break;
+    }
+    let c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
+    return (c);
 }
-function dragEnd() {
-    console.log('drag ended');
-    this.className = 'item';
-    this.parentNode.removeChild(this);
-    ul.appendChild(dragItem);
-    dragItem = null;
-    drawPath();
+
+
+const target = document.getElementById('targetDiv');
+
+target.addEventListener("dragover", function(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    console.log('x koordinaatti  ' + e.offsetX);
+    });
+
+target.addEventListener('drop',(e) => {
+    e.preventDefault();
+    const sourceID = e.dataTransfer.getData('text/plain');
+
+    let dropThis = document.getElementById(sourceID);
+    dropThis.style.display = 'inline'; ////
+    let pasteWidth = dropThis.clientWidth;
     
+    let ul = document.createElement('ul');
+    ul.style.position = 'absolute';
+    e.target.appendChild(ul);
+    
+    let targetWidth = ( e.offsetX / target.clientWidth ) * 100;
+    let targetHeight = ( e.offsetY / target.clientHeight ) * 100;
+
+
+	//ul.style.width = "" + pasteWidth + "px";
+	//ul.style.top = "" + targetHeight+ "%";
+    //ul.style.left = "" +  targetWidth + "%";
+
+	ul.appendChild(dropThis);
+
+
+	let className = dropThis.getAttribute('class');
+
+   console.log("dropTHis alas");
+   console.log(dropThis);
+
+         if(className == 'item'){
+
+        let trueName = teamNameLi(dropThis);
+        console.log("trueName down");
+        console.log(dropThis); //////////
+        
+
+        let vari = dropThis.style.backgroundColor;
+        let xyz = getLatLon(createPathArray(idLahto, idMaali, trueName, data), data);
+
+        let polyline = L.polyline(xyz, {
+            color: vari
+        }).addTo(map);
+				
+		dropThis.polyline = polyline;
+
+         }
+    
+        
+   
+
+
+});
+
+
+/**
+ * Funktiolla järjestetään joukkueen rastit järjestykseen.
+ * Lopulta palautetaan rastit taulukossa.
+ * 
+ * @param {String} lahtoId 
+ * @param {String} maaliId 
+ */
+function createPathArray(lahtoId, maaliId, joukkue, data){
+
+	let start = [];
+	let finish = [];
+	let other = [];
+    let combined = [];
+
+        for (let leimaus of joukkue.rastileimaukset){
+            
+            if (leimaus.rasti == lahtoId){
+                start.push(leimaus);	
+            }
+            if (leimaus.rasti == maaliId){
+                finish.push(leimaus);
+            }
+            if ( leimaus.rasti !== lahtoId && leimaus.rasti !== maaliId ){
+                other.push(leimaus);
+            }
+        }
+    //}
+
+    /* Jarjestetaan muodostuneet taulukot, jotta voidaan myöhemmin yhdistää */
+    start.sort(compareRastitAika);
+    finish.sort(compareRastitAika);
+    other.sort(compareRastitAika);
+
+    /* Tarkastetaan onko "LAHTO":ja useampia, jos on laitetaan niistä viimeinen taulukkoon. */
+    if (start.length > 1){
+        combined.push(start[start.length - 1].rasti);
+    }
+    else {
+        combined.push(start.rasti);
+    }
+
+    combined.push(other.rasti);
+    combined.push(finish.rasti);
+
+    console.log("combined array");
+    console.log(combined);
+
+return combined;
 }
 
-columns.forEach(column => {
-    column.addEventListener('dragover', dragOver);
-    column.addEventListener('dragenter', dragEnter);
-    column.addEventListener('dragleave', dragLeave);
-    column.addEventListener('drop', dragDrop);
-});
+
+/**
+ * Funktiolla muodostetaan saadusta rastitaulukosta latLon taulukko.
+ * Esim. latLonArray = [62.123, 25.123...]
+ * 
+ * @param {Array} array Taulukko
+ * @param {data} data Tietorakenne
+ * @returns lat-lon taulukon.
+ */
+function getLatLon(array, data){
+
+    let latLonArray = [];
+
+    for ( let i = 0; i < array.length; i++){ //TODO: EHKÄ DATA POIS?
+        for ( let rasti of data.rastit){
 
             if( rasti.id == array[i]){
 
@@ -128,17 +247,29 @@ columns.forEach(column => {
     }
 return latLonArray;
 }
-function dragEnter() {
-    console.log('drag entered');
+
+
+
+/**
+ * Funktio hakee joukkueen nimen, joka vastaa parametria.
+ * 
+ * @param {String} liName 
+ * @returns Li nimen, joka vastaa joukkuetta
+ */
+function teamNameLi(liName){
+
+    let nimi;
+    for(let joukkue of joukkueTaulukko){
+        if( joukkue.nimi == liName.innerText){
+            nimi = joukkue;
+            return nimi;
+        }
+    }
 }
-function dragLeave() {
-    console.log('drag left');
-}
-function dragDrop() {
-    e.preventDefault();
-    console.log('drag dropped');
-    this.append(dragItem);
-}
+
+
+
+
 
 /**
 * Funktiolla luodaan lista joukkueista.
@@ -152,7 +283,6 @@ function createTeamList(){
                         
     /* Luodaan ul -elementti ja järjestetään taulukko*/
     let ul = document.createElement("ul");
-    ul.setAttribute("id", "teamUL");
     joukkueTaulukko.sort(compareJoukkue);
             
     /* Käydään joukkueet läpi ja lisätään listaukseen */
@@ -167,51 +297,8 @@ function createTeamList(){
         li.setAttribute("draggable","true");
         li.appendChild(document.createTextNode(joukkueTaulukko[i]["nimi"]));
         ul.appendChild(li);
-        drag(li);
     }
     div1.appendChild(ul);
-
-    let teamUL = document.getElementById("teamUL");
-
-    /**
-     * Raahauksen aloitus.
-     * 
-     * @param {li} li 
-     */
-    function drag(li){
-        li.addEventListener("dragstart", function(e) {
-			e.dataTransfer.setData("text/plain", li.getAttribute("id"));
-		});	
-    }
-
-    /* Dragover */
-    teamUL.addEventListener("dragover", function(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
-    });
-
-    /* Drop */
-    teamUL.addEventListener("drop", function(e) {
-        e.preventDefault();
-        let ram = e.dataTransfer.getData("text/plain");
-        let ramID = document.getElementById(ram);
-
- 
-        if ( ramID.getAttribute('class') == 'item' ){
-            
-
-            let teamUL2 = document.getElementById('joukkueul');
-            ramID.style.display = 'block';
-
-            /* Viivojen poisto */
-            let polylineulos = ramID.polyline;
-            polylineulos.remove(map);
-           
-            teamUL2.appendChild(document.getElementById(ram));
-        }
-    
-        });
-
 }
 
 /**
@@ -227,7 +314,6 @@ function createRastitList(){
 
 	/* Luodaan ul -elementti */
 	let ul = document.createElement("ul");
-    //ul.setAttribute("class", "target");
 	
 	/* Käydään rastit läpi ja lisätään listaukseen */
     for(let i = 0; i < rastitTaulukko.length; i++){
@@ -237,7 +323,7 @@ function createRastitList(){
         /* Luodaan li -elementti */
         let li = document.createElement("li");
         li.setAttribute("id", id);
-        li.setAttribute("class", "item2");
+        li.setAttribute("class", "item");
         li.setAttribute("draggable","true");
         li.appendChild(document.createTextNode(rastitTaulukko[i]["koodi"]));
         ul.appendChild(li);
@@ -245,7 +331,7 @@ function createRastitList(){
     div3.appendChild(ul);
 	
 }
-            
+       
 /**
 * Funktiolla luodaan deepcopy taulukko alkuperäisestä data.joukkueet taulukosta.
 */
@@ -310,83 +396,31 @@ function compareJoukkue(joukkue1, joukkue2) {
     	return 0;
 }
 
+
+
 /** 
-* Apufunktio, joka jarjestaa rastit.
+* Apufunktio, joka vertailee joukkeuiden nimiä.
 *
-* @param {String} rasti1
-* @param {String} rasti2
+* @param {String} joukkue1
+* @param {String} joukkue2
 * @returns -1, 0 tai 1
 */
 function compareRastit(rasti1, rasti2) {
             
-    if (rasti1.koodi.toLowerCase() > rasti2.koodi.toLowerCase()) {
-        return -1;
-    }
     if (rasti1.koodi.toLowerCase() < rasti2.koodi.toLowerCase()) {
         return 1;
     }
-    	return 0;      
-}
-
-
-/** 
-* Apufunktio, joka jarjestaa rastit ajan perusteella.
-*
-* @param {String} rasti1
-* @param {String} rasti2
-* @returns -1, 0 tai 1
-*/
-function compareRastitAika(rasti1, rasti2) {
-            
-    if (rasti1.aika.toLowerCase() < rasti2.aika.toLowerCase()) {
+    if (rasti1.koodi.toLowerCase() > rasti2.koodi.toLowerCase()) {
         return -1;
     }
-    if (rasti1.aika.toLowerCase() > rasti2.aika.toLowerCase()) {
-        return 1;
-    }
-    	return 0;      
-}
-
-/**
- * Apufunktio, joka palauttaa sen rastin ID:n, jolla on koodina "LAHTO".
- * 
- * @returns rastin koodilla "LAHTO" id.
- */
-function idLahto(){
-
-let lahtoID;
-
-for (let rasti of rastitTaulukko){
-
-    if(rasti.koodi == 'LAHTO'){
-        lahtoID = rasti.id;
-        return lahtoID;
-    }
-}
-
+    	return 0;
 }
 
 
-/**
- * Apufunktio, joka palauttaa sen rastin ID:n, jolla on koodina "MAALI".
- * 
- * @returns rastin koodilla "MAALI" id.
- */
- function idMaali(){
 
-    let maaliID;
-    
-    for (let rasti of rastitTaulukko){
-    
-        if(rasti.koodi == 'MAALI'){
-            maaliID = rasti.id;
-            return maaliID;
-        }
-    }
-    
-    }
-
-      
+  
+            
+            
 
 
 
