@@ -15,10 +15,10 @@ window.addEventListener("load", function(e) {
 let joukkueTaulukko = [];
 let rastitTaulukko = [];
 let rastitLatLon= [];
+let leimaukset = [];
 
 /* Kutsutaan metodeja */
 joukkueetDeep();
-//rastitDeep();
 createTeamList();
 createRastitList();
 
@@ -42,43 +42,63 @@ rastitTaulukko.forEach(function(coord) {
   });
 
 /* Piirretään reitti */
-//drawPath();
+function drawPath(param){
 
-function drawPath(){
+let pointlist = [];
+let rastinId = [];
 
 for(let joukkue of joukkueTaulukko){
+    
+    for(let leimaus of joukkue.rastileimaukset){
 
-    let polygon = L.polygon([
-    getLatLon(getRastinId)
-    ]).addTo(map);
+        if(leimaus.rasti != "" && leimaus.rasti != undefined){
+            // Lista joukkueen rastien koordinaateista 
+            rastinId = getRastinId(leimaus.rasti);
+            pointlist.push(rastinId);
+            console.log("pointlist");
+            console.log(pointlist);
+            
+        }
+    }
+    let polyline = new L.Polyline(pointlist, {
+        color: joukkue.vari,
+        weight: 3,
+        opacity: 0.5,
+        smoothFactor: 1
+    });
+    polyline.addTo(map);
+    pointlist = [];
 }
 
-}
 
-console.log( getLatLon(getRastinId));
+
+} 
 
 /* Plään --> Rastien id --> idn perusteella lat ja lon --> piirretään polku */
 
-function getLatLon(id){
+/* function getLatLon(id){
 
     for(let i = 0; i < rastitTaulukko.length;i++){
-        if(id === rastitTaulukko[i]["id"]){
-            rastitLatLon.push([rastitTaulukko[i]["lat"], rastitTaulukko[i]["lon"]]);
+        if(id === rastitTaulukko[i].id){
+            rastitLatLon.push([rastitTaulukko[i].lat, rastitTaulukko[i].lon]);
             return rastitLatLon;
         }
     }
     rastitLatLon = [];
 }
-
+ */
 
 /* Joukkueen rastin id */
-function getRastinId(){
+function getRastinId(rastileimaus){
 
-    let id;
-    for(let i = 0; i < joukkueTaulukko.length; i++){
-        id = joukkueTaulukko[i].rastileimaukset[i]["rasti"];
-        console.log(id);
-        return id;
+    let array = [];
+
+    for(let rasti of data.rastit){
+
+        if(rasti.id == rastileimaus){
+            array.push(rasti.lat,rasti.lon);      
+            return array;
+        }
     }
 }
 
@@ -267,10 +287,6 @@ function teamNameLi(liName){
     }
 }
 
-
-
-
-
 /**
 * Funktiolla luodaan lista joukkueista.
 */
@@ -283,22 +299,70 @@ function createTeamList(){
                         
     /* Luodaan ul -elementti ja järjestetään taulukko*/
     let ul = document.createElement("ul");
+    ul.setAttribute("id", "teamUL");
     joukkueTaulukko.sort(compareJoukkue);
             
     /* Käydään joukkueet läpi ja lisätään listaukseen */
     for(let i = 0; i < joukkueTaulukko.length;i++){
 
+        
+
         let id = joukkueTaulukko[i]["nimi"];
               
         /* Luodaan li -elementti */
         let li = document.createElement("li");
+        li.style.backgroundColor = rainbow(joukkueTaulukko.length,i);
+        joukkueTaulukko[i].vari = li.style.backgroundColor;
         li.setAttribute("id", id);
         li.setAttribute("class", "item");
         li.setAttribute("draggable","true");
         li.appendChild(document.createTextNode(joukkueTaulukko[i]["nimi"]));
         ul.appendChild(li);
+        drag(li);
     }
     div1.appendChild(ul);
+
+    let teamUL = document.getElementById("teamUL");
+
+    /**
+     * Raahauksen aloitus.
+     * 
+     * @param {li} li 
+     */
+    function drag(li){
+        li.addEventListener("dragstart", function(e) {
+			e.dataTransfer.setData("text/plain", li.getAttribute("id"));
+		});	
+    }
+
+    /* Dragover */
+    teamUL.addEventListener("dragover", function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    });
+
+    /* Drop */
+    teamUL.addEventListener("drop", function(e) {
+        e.preventDefault();
+        let ram = e.dataTransfer.getData("text/plain");
+        let ramID = document.getElementById(ram);
+
+ 
+        if ( ramID.getAttribute('class') == 'item' ){
+            
+
+            let teamUL2 = document.getElementById('joukkueul');
+            ramID.style.display = 'block';
+
+            /* Viivojen poisto */
+            let polylineulos = ramID.polyline;
+            polylineulos.remove(map);
+           
+            teamUL2.appendChild(document.getElementById(ram));
+        }
+    
+        });
+
 }
 
 /**
@@ -314,6 +378,7 @@ function createRastitList(){
 
 	/* Luodaan ul -elementti */
 	let ul = document.createElement("ul");
+    //ul.setAttribute("class", "target");
 	
 	/* Käydään rastit läpi ja lisätään listaukseen */
     for(let i = 0; i < rastitTaulukko.length; i++){
@@ -322,14 +387,16 @@ function createRastitList(){
               
         /* Luodaan li -elementti */
         let li = document.createElement("li");
+        li.style.backgroundColor = rainbow(rastitTaulukko.length,i);
+        
         li.setAttribute("id", id);
-        li.setAttribute("class", "item");
+        li.setAttribute("class", "item2");
         li.setAttribute("draggable","true");
         li.appendChild(document.createTextNode(rastitTaulukko[i]["koodi"]));
         ul.appendChild(li);
     }
     div3.appendChild(ul);
-	
+
 }
        
 /**
@@ -396,31 +463,83 @@ function compareJoukkue(joukkue1, joukkue2) {
     	return 0;
 }
 
-
-
 /** 
-* Apufunktio, joka vertailee joukkeuiden nimiä.
+* Apufunktio, joka jarjestaa rastit.
 *
-* @param {String} joukkue1
-* @param {String} joukkue2
+* @param {String} rasti1
+* @param {String} rasti2
 * @returns -1, 0 tai 1
 */
 function compareRastit(rasti1, rasti2) {
             
-    if (rasti1.koodi.toLowerCase() < rasti2.koodi.toLowerCase()) {
-        return 1;
-    }
     if (rasti1.koodi.toLowerCase() > rasti2.koodi.toLowerCase()) {
         return -1;
     }
-    	return 0;
+    if (rasti1.koodi.toLowerCase() < rasti2.koodi.toLowerCase()) {
+        return 1;
+    }
+    	return 0;      
 }
 
 
+/** 
+* Apufunktio, joka jarjestaa rastit ajan perusteella.
+*
+* @param {String} rasti1
+* @param {String} rasti2
+* @returns -1, 0 tai 1
+*/
+function compareRastitAika(rasti1, rasti2) {
+            
+    if (rasti1.aika.toLowerCase() < rasti2.aika.toLowerCase()) {
+        return -1;
+    }
+    if (rasti1.aika.toLowerCase() > rasti2.aika.toLowerCase()) {
+        return 1;
+    }
+    	return 0;      
+}
 
-  
-            
-            
+/**
+ * Apufunktio, joka palauttaa sen rastin ID:n, jolla on koodina "LAHTO".
+ * 
+ * @returns rastin koodilla "LAHTO" id.
+ */
+function idLahto(){
+
+let lahtoID;
+
+for (let rasti of rastitTaulukko){
+
+    if(rasti.koodi == 'LAHTO'){
+        lahtoID = rasti.id;
+        return lahtoID;
+    }
+}
+
+}
+
+
+/**
+ * Apufunktio, joka palauttaa sen rastin ID:n, jolla on koodina "MAALI".
+ * 
+ * @returns rastin koodilla "MAALI" id.
+ */
+ function idMaali(){
+
+    let maaliID;
+    
+    for (let rasti of rastitTaulukko){
+    
+        if(rasti.koodi == 'MAALI'){
+            maaliID = rasti.id;
+            return maaliID;
+        }
+    }
+    
+    }
+
+      
 
 
 
