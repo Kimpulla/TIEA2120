@@ -15,10 +15,10 @@ window.addEventListener("load", function(e) {
 let joukkueTaulukko = [];
 let rastitTaulukko = [];
 let rastitLatLon= [];
-let leimaukset = [];
 
 /* Kutsutaan metodeja */
 joukkueetDeep();
+//rastitDeep();
 createTeamList();
 createRastitList();
 
@@ -42,93 +42,46 @@ rastitTaulukko.forEach(function(coord) {
   });
 
 /* Piirretään reitti */
-function drawPath(param){
+//drawPath();
 
-let pointlist = [];
-let rastinId = [];
+function drawPath(){
 
 for(let joukkue of joukkueTaulukko){
-    
-    for(let leimaus of joukkue.rastileimaukset){
 
-        if(leimaus.rasti != "" && leimaus.rasti != undefined){
-            // Lista joukkueen rastien koordinaateista 
-            rastinId = getRastinId(leimaus.rasti);
-            pointlist.push(rastinId);
-            console.log("pointlist");
-            console.log(pointlist);
-            
-        }
-    }
-    let polyline = new L.Polyline(pointlist, {
-        color: joukkue.vari,
-        weight: 3,
-        opacity: 0.5,
-        smoothFactor: 1
-    });
-    polyline.addTo(map);
-    pointlist = [];
+    let polygon = L.polygon([
+    getLatLon(getRastinId)
+    ]).addTo(map);
 }
 
+}
 
-
-} 
+console.log( getLatLon(getRastinId));
 
 /* Plään --> Rastien id --> idn perusteella lat ja lon --> piirretään polku */
 
-function getLatLon(id){
+/* function getLatLon(id){
 
     for(let i = 0; i < rastitTaulukko.length;i++){
-        if(id === rastitTaulukko[i].id){
-            rastitLatLon.push([rastitTaulukko[i].lat, rastitTaulukko[i].lon]);
+        if(id === rastitTaulukko[i]["id"]){
+            rastitLatLon.push([rastitTaulukko[i]["lat"], rastitTaulukko[i]["lon"]]);
             return rastitLatLon;
         }
     }
     rastitLatLon = [];
 }
-
+ */
 
 /* Joukkueen rastin id */
-function getRastinId(rastileimaus){
+function getRastinId(){
 
-    let array = [];
-
-    for(let rasti of data.rastit){
-
-        if(rasti.id == rastileimaus){
-            array.push(rasti.lat,rasti.lon);      
-            return array;
-        }
+    let id;
+    for(let i = 0; i < joukkueTaulukko.length; i++){
+        id = joukkueTaulukko[i].rastileimaukset[i]["rasti"];
+        console.log(id);
+        return id;
     }
 }
 
-/**
- * Funktiolla värjätään asioita.
- * 
- * @param {*} numOfSteps 
- * @param {*} step 
- * @returns 
- */
-function rainbow(numOfSteps, step) {
-    // This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal for creating easily distinguishable vibrant markers in Google Maps and other apps.
-    // Adam Cole, 2011-Sept-14
-    // HSV to RBG adapted from: http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-    let r, g, b;
-    let h = step / numOfSteps;
-    let i = ~~(h * 6);
-    let f = h * 6 - i;
-    let q = 1 - f;
-    switch(i % 6){
-        case 0: r = 1; g = f; b = 0; break;
-        case 1: r = q; g = 1; b = 0; break;
-        case 2: r = 0; g = 1; b = f; break;
-        case 3: r = 0; g = q; b = 1; break;
-        case 4: r = f; g = 0; b = 1; break;
-        case 5: r = 1; g = 0; b = q; break;
-    }
-    let c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
-    return (c);
-}
 
 
 
@@ -142,44 +95,38 @@ let dragItem = null;
 items.forEach(item => {
     item.addEventListener('dragstart', dragStart);
     item.addEventListener('dragend', dragEnd);
-    item.addEventListener('drop', dragDrop);
 });
 
 function dragStart() {
     console.log('drag started');
     dragItem = this;
-    e.dataTransfer.setData("text/plain", items.getAttribute("id"));
+    //setTimeout(() => this.className = 'invisible', 0);
 }
-
 function dragEnd() {
     console.log('drag ended');
     this.className = 'item';
     this.parentNode.removeChild(this);
     ul.appendChild(dragItem);
     dragItem = null;
-}
-
-function dragDrop() {
-    e.preventDefault();
-   // console.log('drag dropped');
-   // this.append(dragItem);
-   let data = e.dataTransfer.getData("text/plain");
-   e.target.appendChild(document.getElementById(data));
-    drawPath(e.target);
+    drawPath();
     
-} 
+}
 
 columns.forEach(column => {
     column.addEventListener('dragover', dragOver);
     column.addEventListener('dragenter', dragEnter);
     column.addEventListener('dragleave', dragLeave);
-    //column.addEventListener('drop', dragDrop);
+    column.addEventListener('drop', dragDrop);
 });
 
+            if( rasti.id == array[i]){
 
-function dragOver() {
-    e.preventDefault();
-    console.log('drag over');
+                latLonArray.push(rasti.lat);
+                latLonArray.push(rasti.lon);
+            }
+        }
+    }
+return latLonArray;
 }
 function dragEnter() {
     console.log('drag entered');
@@ -187,10 +134,11 @@ function dragEnter() {
 function dragLeave() {
     console.log('drag left');
 }
-
-
-
-
+function dragDrop() {
+    e.preventDefault();
+    console.log('drag dropped');
+    this.append(dragItem);
+}
 
 /**
 * Funktiolla luodaan lista joukkueista.
@@ -204,26 +152,66 @@ function createTeamList(){
                         
     /* Luodaan ul -elementti ja järjestetään taulukko*/
     let ul = document.createElement("ul");
+    ul.setAttribute("id", "teamUL");
     joukkueTaulukko.sort(compareJoukkue);
             
     /* Käydään joukkueet läpi ja lisätään listaukseen */
     for(let i = 0; i < joukkueTaulukko.length;i++){
 
-        
-
         let id = joukkueTaulukko[i]["nimi"];
               
         /* Luodaan li -elementti */
         let li = document.createElement("li");
-        li.style.backgroundColor = rainbow(joukkueTaulukko.length,i);
-        joukkueTaulukko[i].vari = li.style.backgroundColor;
         li.setAttribute("id", id);
         li.setAttribute("class", "item");
         li.setAttribute("draggable","true");
         li.appendChild(document.createTextNode(joukkueTaulukko[i]["nimi"]));
         ul.appendChild(li);
+        drag(li);
     }
     div1.appendChild(ul);
+
+    let teamUL = document.getElementById("teamUL");
+
+    /**
+     * Raahauksen aloitus.
+     * 
+     * @param {li} li 
+     */
+    function drag(li){
+        li.addEventListener("dragstart", function(e) {
+			e.dataTransfer.setData("text/plain", li.getAttribute("id"));
+		});	
+    }
+
+    /* Dragover */
+    teamUL.addEventListener("dragover", function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    });
+
+    /* Drop */
+    teamUL.addEventListener("drop", function(e) {
+        e.preventDefault();
+        let ram = e.dataTransfer.getData("text/plain");
+        let ramID = document.getElementById(ram);
+
+ 
+        if ( ramID.getAttribute('class') == 'item' ){
+            
+
+            let teamUL2 = document.getElementById('joukkueul');
+            ramID.style.display = 'block';
+
+            /* Viivojen poisto */
+            let polylineulos = ramID.polyline;
+            polylineulos.remove(map);
+           
+            teamUL2.appendChild(document.getElementById(ram));
+        }
+    
+        });
+
 }
 
 /**
@@ -239,6 +227,7 @@ function createRastitList(){
 
 	/* Luodaan ul -elementti */
 	let ul = document.createElement("ul");
+    //ul.setAttribute("class", "target");
 	
 	/* Käydään rastit läpi ja lisätään listaukseen */
     for(let i = 0; i < rastitTaulukko.length; i++){
@@ -247,31 +236,15 @@ function createRastitList(){
               
         /* Luodaan li -elementti */
         let li = document.createElement("li");
-        li.style.backgroundColor = rainbow(rastitTaulukko.length,i);
-        
         li.setAttribute("id", id);
-        li.setAttribute("class", "item");
+        li.setAttribute("class", "item2");
         li.setAttribute("draggable","true");
         li.appendChild(document.createTextNode(rastitTaulukko[i]["koodi"]));
         ul.appendChild(li);
     }
     div3.appendChild(ul);
-
+	
 }
-
-
-/* function leimauksetDeep(){
-            
-    let joukkueet = joukkueTaulukko;
-    for (let joukkue of joukkueet) {
-        let rastiAttributes = {
-            id: joukkue.getRastinId
-        };
-    	leimaukset.push(rastiAttributes);      
-    }
-    console.log("leimausket: ");
-     console.log(leimaukset);
-} */
             
 /**
 * Funktiolla luodaan deepcopy taulukko alkuperäisestä data.joukkueet taulukosta.
@@ -337,31 +310,83 @@ function compareJoukkue(joukkue1, joukkue2) {
     	return 0;
 }
 
-
-
 /** 
-* Apufunktio, joka vertailee joukkeuiden nimiä.
+* Apufunktio, joka jarjestaa rastit.
 *
-* @param {String} joukkue1
-* @param {String} joukkue2
+* @param {String} rasti1
+* @param {String} rasti2
 * @returns -1, 0 tai 1
 */
 function compareRastit(rasti1, rasti2) {
             
-    if (rasti1.koodi.toLowerCase() < rasti2.koodi.toLowerCase()) {
-        return 1;
-    }
     if (rasti1.koodi.toLowerCase() > rasti2.koodi.toLowerCase()) {
         return -1;
     }
-    	return 0;
+    if (rasti1.koodi.toLowerCase() < rasti2.koodi.toLowerCase()) {
+        return 1;
+    }
+    	return 0;      
 }
 
 
+/** 
+* Apufunktio, joka jarjestaa rastit ajan perusteella.
+*
+* @param {String} rasti1
+* @param {String} rasti2
+* @returns -1, 0 tai 1
+*/
+function compareRastitAika(rasti1, rasti2) {
+            
+    if (rasti1.aika.toLowerCase() < rasti2.aika.toLowerCase()) {
+        return -1;
+    }
+    if (rasti1.aika.toLowerCase() > rasti2.aika.toLowerCase()) {
+        return 1;
+    }
+    	return 0;      
+}
 
-  
-            
-            
+/**
+ * Apufunktio, joka palauttaa sen rastin ID:n, jolla on koodina "LAHTO".
+ * 
+ * @returns rastin koodilla "LAHTO" id.
+ */
+function idLahto(){
+
+let lahtoID;
+
+for (let rasti of rastitTaulukko){
+
+    if(rasti.koodi == 'LAHTO'){
+        lahtoID = rasti.id;
+        return lahtoID;
+    }
+}
+
+}
+
+
+/**
+ * Apufunktio, joka palauttaa sen rastin ID:n, jolla on koodina "MAALI".
+ * 
+ * @returns rastin koodilla "MAALI" id.
+ */
+ function idMaali(){
+
+    let maaliID;
+    
+    for (let rasti of rastitTaulukko){
+    
+        if(rasti.koodi == 'MAALI'){
+            maaliID = rasti.id;
+            return maaliID;
+        }
+    }
+    
+    }
+
+      
 
 
 
